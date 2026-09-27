@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pytest: zero to hero · complete reference tutorial</title>
+    <meta name="description" content="The complete beginner → advanced pytest tutorial. Every fixture, every mark, every hook, every config option — with runnable examples.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <style>
+        :root {
+            --bg: #f9fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-soft: #475569;
+            --text-dim: #64748b;
+            --border: #e2e8f0;
+            --border-soft: #f1f5f9;
+            --accent: #2563eb;
+            --accent-soft: #dbeafe;
+            --accent-text: #1e40af;
+            --code-bg: #f1f5f9;
+            --pre-bg: #0f172a;
+            --note-bg: #eff6ff;
+            --tip-bg: #f0fdf4;
+            --warn-bg: #fefce8;
+            --note-border: #3b82f6;
+            --tip-border: #22c55e;
+            --warn-border: #eab308;
+            --shadow: 0 20px 35px -8px rgba(0,0,0,0.08), 0 8px 12px -4px rgba(0,0,0,0.04);
+        }
+        [data-theme="dark"] {
+            --bg: #0b1120;
+            --card: #111827;
+            --text: #e2e8f0;
+            --text-soft: #cbd5e1;
+            --text-dim: #94a3b8;
+            --border: #1e293b;
+            --border-soft: #1e293b;
+            --accent: #60a5fa;
+            --accent-soft: #1e3a8a;
+            --accent-text: #bfdbfe;
+            --code-bg: #1e293b;
+            --pre-bg: #020617;
+            --note-bg: #172554;
+            --tip-bg: #052e16;
+            --warn-bg: #422006;
+            --shadow: 0 20px 35px -8px rgba(0,0,0,0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            padding: 2rem 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .layout {
+            max-width: 1320px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 1000px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+        .sidebar {
+            position: sticky;
+            top: 1rem;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem 1.4rem;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow);
+        }
+        .sidebar h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            margin: 1rem 0 0.4rem;
+            font-weight: 700;
+        }
+        .sidebar h4:first-child { margin-top: 0; }
+        .sidebar a {
+            display: block;
+            padding: 0.25rem 0;
+            color: var(--text-soft);
+            border-bottom: none;
+            font-weight: 400;
+            font-size: 0.83rem;
+            line-height: 1.35;
+        }
+        .sidebar a:hover { color: var(--accent); }
+        .container {
+            background: var(--card);
+            border-radius: 2rem;
+            box-shadow: var(--shadow);
+            padding: 3rem 2.5rem;
+            min-width: 0;
+        }
+        @media (max-width: 640px) {
+            body { padding: 0.75rem; }
+            .container { padding: 1.8rem 1.2rem; border-radius: 1.5rem; }
+            h1 { font-size: 2.1rem !important; }
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(145deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+            line-height: 1.15;
+        }
+        .subhead {
+            font-size: 1.15rem;
+            color: var(--text-soft);
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--accent);
+            padding-left: 1.25rem;
+            font-weight: 400;
+        }
+        .meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 3.5rem 0 1.2rem 0;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            scroll-margin-top: 1rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 2rem 0 0.8rem;
+            color: var(--text);
+            scroll-margin-top: 1rem;
+        }
+        h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+            color: var(--text-soft);
+        }
+        p, li { color: var(--text-soft); margin-bottom: 1rem; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.4rem; }
+        a { color: var(--accent); text-decoration: none; font-weight: 500; border-bottom: 1px dashed rgba(37,99,235,0.4); }
+        a:hover { border-bottom-style: solid; }
+        code:not(pre code) {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.15rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.88em;
+            color: var(--text);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        pre {
+            background: var(--pre-bg) !important;
+            border-radius: 1rem;
+            padding: 1.25rem !important;
+            margin: 1.2rem 0 1.8rem;
+            overflow-x: auto;
+            font-size: 0.87rem;
+            border: 1px solid #1e293b;
+            line-height: 1.55;
+        }
+        pre code {
+            font-family: 'JetBrains Mono', monospace;
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            color: #e2e8f0;
+        }
+        .badge {
+            display: inline-block;
+            background: var(--accent-soft);
+            color: var(--accent-text);
+            font-weight: 600;
+            font-size: 0.7rem;
+            letter-spacing: 0.4px;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            margin-right: 0.4rem;
+            vertical-align: middle;
+        }
+        .badge.new { background: #dcfce7; color: #166534; }
+        .badge.adv { background: #fef3c7; color: #92400e; }
+        [data-theme="dark"] .badge { background: #1e3a8a; color: #bfdbfe; }
+        [data-theme="dark"] .badge.new { background: #14532d; color: #bbf7d0; }
+        [data-theme="dark"] .badge.adv { background: #78350f; color: #fde68a; }
+        .note, .tip, .warning {
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            font-size: 0.97rem;
+            color: var(--text);
+            border-left: 6px solid;
+        }
+        .note { background: var(--note-bg); border-left-color: var(--note-border); }
+        .tip { background: var(--tip-bg); border-left-color: var(--tip-border); }
+        .warning { background: var(--warn-bg); border-left-color: var(--warn-border); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+        @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+        .file-tree {
+            background: var(--code-bg);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.87rem;
+            border: 1px solid var(--border);
+            margin: 1.5rem 0;
+            line-height: 1.7;
+            color: var(--text);
+        }
+        .file-tree .dim { color: var(--text-dim); }
+        hr { border: none; border-top: 2px dashed var(--border); margin: 3rem 0; }
+        .footer {
+            margin-top: 3.5rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+        .table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 1rem; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: var(--border-soft); text-align: left; padding: 0.9rem 1.2rem; font-weight: 600; color: var(--text); }
+        td { padding: 0.8rem 1.2rem; border-top: 1px solid var(--border); vertical-align: top; color: var(--text-soft); }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transition: transform 0.15s;
+        }
+        .theme-toggle:hover { transform: scale(1.08); }
+        .err {
+            background: #fef2f2;
+            border-left: 6px solid #ef4444;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        [data-theme="dark"] .err { background: #450a0a; border-left-color: #dc2626; color: #fecaca; }
+        .err code { color: inherit; background: rgba(0,0,0,0.1); border: none; }
+    </style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h4>Getting started</h4>
+        <a href="#s1">1. Setup &amp; first test</a>
+        <a href="#s2">2. Assertions &amp; exceptions</a>
+        <a href="#s3">3. Assertion rewriting</a>
+        <h4>Core pytest</h4>
+        <a href="#s4">4. Fixtures</a>
+        <a href="#s5">5. Parametrization</a>
+        <a href="#s6">6. Marks</a>
+        <a href="#s7">7. Monkeypatch &amp; mocking</a>
+        <h4>Built-in fixtures</h4>
+        <a href="#s8">8. tmp_path / capsys / caplog</a>
+        <a href="#s9">9. pytest.approx &amp; warnings</a>
+        <h4>Configuration</h4>
+        <a href="#s10">10. Config files</a>
+        <a href="#s11">11. Full ini options</a>
+        <a href="#s12">12. Import modes &amp; __init__</a>
+        <a href="#s13">13. conftest.py hierarchy</a>
+        <h4>Advanced fixtures</h4>
+        <a href="#s14">14. request object &amp; advanced</a>
+        <a href="#s15">15. Class-based tests</a>
+        <a href="#s16">16. Async testing</a>
+        <a href="#s17">17. Doctests</a>
+        <h4>Debugging</h4>
+        <a href="#s18">18. Debugging tests</a>
+        <a href="#s19">19. Running subsets</a>
+        <a href="#s20">20. Runtime helpers</a>
+        <h4>Plugins &amp; extensions</h4>
+        <a href="#s21">21. Plugins that matter</a>
+        <a href="#s22">22. Hooks &amp; custom plugins</a>
+        <a href="#s23">23. Property-based testing</a>
+        <h4>Quality &amp; CI</h4>
+        <a href="#s24">24. Test taxonomy</a>
+        <a href="#s25">25. Anti-patterns</a>
+        <a href="#s26">26. Common errors → fixes</a>
+        <a href="#s27">27. CI with GitHub Actions</a>
+        <h4>Putting it together</h4>
+        <a href="#s28">28. Real-world example</a>
+        <a href="#cheatsheet">Cheatsheet</a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="container">
+
+        <h1>pytest: zero to hero</h1>
+        <div class="subhead">The complete beginner → advanced pytest reference. Every fixture, mark, hook, and config option — with runnable examples.</div>
+        <div class="meta">
+            <span class="badge">28 sections</span>
+            <span class="badge">100+ examples</span>
+            <span class="badge">runnable</span>
+            <span class="badge">no fluff</span>
+        </div>
+
+        <!-- ===================================================== -->
+        <h2 id="s1">1. Setup &amp; first test</h2>
+        <p>Install pytest (preferably inside a virtual environment):</p>
+        <pre><code class="language-bash">pip install pytest</code></pre>
+        <p>Create <code>test_sample.py</code>. By default pytest discovers files named <code>test_*.py</code> or <code>*_test.py</code>, classes prefixed <code>Test</code>, and functions prefixed <code>test_</code>.</p>
+        <pre><code class="language-python"># test_sample.py
+def test_always_passes():
+    assert True
+
+def test_arithmetic():
+    assert 2 + 2 == 4
+    assert 3 * 4 == 12</code></pre>
+        <p>Run it:</p>
+        <pre><code class="language-bash">pytest test_sample.py -v</code></pre>
+        <pre><code class="language-bash">test_sample.py::test_always_passes PASSED
+test_sample.py::test_arithmetic PASSED
+============================== 2 passed in 0.02s ===============================</code></pre>
+        <div class="tip">💡 Use <code>pytest -v</code> (verbose) / <code>-q</code> (quiet). Running plain <code>pytest</code> discovers everything below the current directory.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s2">2. Assertions &amp; expected exceptions</h2>
+        <p>pytest uses Python's built-in <code>assert</code> but adds rich introspection. Failed assertions show a diff of actual vs. expected values.</p>
+        <pre><code class="language-python">def test_failure_demo():
+    expected = {"name": "Alice", "age": 30}
+    actual = {"name": "Alice", "age": 31}
+    assert actual == expected  # pytest shows a helpful diff</code></pre>
+        <p>Testing exceptions with <code>pytest.raises</code>:</p>
+        <pre><code class="language-python">import pytest
+
+def divide(a, b):
+    if b == 0:
+        raise ValueError("Cannot divide by zero")
+    return a / b
+
+def test_divide_by_zero():
+    with pytest.raises(ValueError) as excinfo:
+        divide(10, 0)
+    assert "Cannot divide by zero" in str(excinfo.value)
+
+def test_divide_zero_match():
+    with pytest.raises(ValueError, match="divide by zero"):  # regex
+        divide(1, 0)</code></pre>
+
+        <h3>Exception groups (Python 3.11+)</h3>
+        <pre><code class="language-python">import pytest
+
+def raises_group():
+    raise ExceptionGroup("many errors", [ValueError("a"), TypeError("b")])
+
+def test_group():
+    with pytest.raises(ExceptionGroup) as exc:
+        raises_group()
+    assert len(exc.value.exceptions) == 2</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s3">3. Assertion rewriting — the magic explained <span class="badge adv">advanced</span></h2>
+        <p>pytest rewrites the AST of every test module before execution. That's why:</p>
+        <ul>
+            <li>You write plain <code>assert</code> (no <code>self.assertEqual</code>).</li>
+            <li>Failed assertions show the values of intermediate expressions.</li>
+            <li>Asserts work even when Python is run with <code>-O</code> (which normally strips them).</li>
+        </ul>
+        <pre><code class="language-python">def test_rewrite_demo():
+    a, b = 1, 2
+    assert a + b == 4
+    # E   assert (1 + 2) == 4
+    # E    +  where 1 = a
+    # E    +  and   2 = b</code></pre>
+        <p>Disable with <code>--assert=plain</code> (rarely useful) or per-module with <code>PYTEST_DONT_REWRITE</code>.</p>
+        <div class="note">📌 Assertion rewriting does <strong>not</strong> work inside <code>exec()</code>, <code>eval()</code>, or list/generator comprehensions on some Python versions. Keep assertions simple.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s4">4. Fixtures — the heart of pytest</h2>
+        <p>Fixtures provide a baseline for tests: data, connections, temp files, or anything reusable. Defined with <code>@pytest.fixture</code>, injected by name.</p>
+        <pre><code class="language-python">import pytest
+
+@pytest.fixture
+def sample_list():
+    return [1, 2, 3, 4, 5]
+
+def test_sum(sample_list):
+    assert sum(sample_list) == 15
+
+def test_length(sample_list):
+    assert len(sample_list) == 5</code></pre>
+
+        <h3>Fixture scopes</h3>
+        <p>Default scope is <code>function</code>. Other scopes: <code>class</code>, <code>module</code>, <code>package</code>, <code>session</code>.</p>
+        <pre><code class="language-python">@pytest.fixture(scope="module")
+def expensive_resource():
+    print("\n[setup]")
+    resource = {"data": [1, 2, 3]}
+    yield resource
+    print("\n[teardown]")
+
+def test_one(expensive_resource):
+    assert expensive_resource["data"][0] == 1
+
+def test_two(expensive_resource):
+    assert len(expensive_resource["data"]) == 3</code></pre>
+
+        <h3>Fixtures requesting other fixtures</h3>
+        <pre><code class="language-python">@pytest.fixture
+def base_url():
+    return "https://api.example.com"
+
+@pytest.fixture
+def api_client(base_url):
+    return {"base": base_url, "timeout": 5}
+
+def test_client(api_client):
+    assert api_client["base"].startswith("https")</code></pre>
+
+        <div class="tip">🔁 <strong>Autouse:</strong> <code>@pytest.fixture(autouse=True)</code> applies a fixture to every test in scope without explicit injection. Use <code>--setup-show</code> to see the order.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s5">5. Parametrization — one test, many cases</h2>
+        <pre><code class="language-python">import pytest
+
+def is_even(n):
+    return n % 2 == 0
+
+@pytest.mark.parametrize("number, expected", [
+    (2, True), (3, False), (0, True), (-4, True), (7, False),
+])
+def test_is_even(number, expected):
+    assert is_even(number) == expected</code></pre>
+        <p>Stack decorators for combinations (4 runs here):</p>
+        <pre><code class="language-python">@pytest.mark.parametrize("x", [0, 1])
+@pytest.mark.parametrize("y", [2, 3])
+def test_combinations(x, y):
+    assert x + y > 0</code></pre>
+        <p>Use <code>pytest.param</code> for custom IDs, marks, or skip:</p>
+        <pre><code class="language-python">@pytest.mark.parametrize("value, expected", [
+    pytest.param(2, 4, id="positive"),
+    pytest.param(-2, 4, id="negative"),
+    pytest.param(0, 0, id="zero"),
+    pytest.param(5, 25, id="skip-me", marks=pytest.mark.skip(reason="example")),
+])
+def test_square(value, expected):
+    assert value * value == expected</code></pre>
+
+        <h3>Readable IDs via <code>ids</code></h3>
+        <pre><code class="language-python">@pytest.fixture(params=[0, 1], ids=["zero", "one"])
+def fixture_num(request):
+    return request.param
+
+# or on parametrize directly
+@pytest.mark.parametrize("n", [0, 1], ids=["zero", "one"])
+def test_ids(n):
+    assert n in (0, 1)</code></pre>
+
+        <h3>Dynamic parametrization via <code>pytest_generate_tests</code></h3>
+        <pre><code class="language-python"># conftest.py
+def pytest_generate_tests(metafunc):
+    if "value" in metafunc.fixturenames:
+        metafunc.parametrize("value", [10, 20, 30])</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s6">6. Marks: skip, xfail, and custom</h2>
+        <ul>
+            <li><code>@pytest.mark.skip</code> — always skip.</li>
+            <li><code>@pytest.mark.skipif</code> — skip conditionally.</li>
+            <li><code>@pytest.mark.xfail</code> — expected to fail.</li>
+            <li><code>@pytest.mark.&lt;name&gt;</code> — custom marks selectable with <code>-m</code>.</li>
+        </ul>
+        <pre><code class="language-python">import sys
+import pytest
+
+@pytest.mark.skip(reason="feature not implemented yet")
+def test_future(): ...
+
+@pytest.mark.skipif(sys.version_info &lt; (3, 10), reason="3.10+")
+def test_new_syntax():
+    assert (x := 5) == 5
+
+@pytest.mark.xfail(reason="known issue #123")
+def test_flaky():
+    assert 1 == 2
+
+@pytest.mark.slow
+def test_slow_thing():
+    import time; time.sleep(2)</code></pre>
+        <p>Run only marked: <code>pytest -m slow</code>. Exclude: <code>pytest -m "not slow"</code>. Register markers to silence warnings:</p>
+        <pre><code class="language-ini">[pytest]
+markers =
+    slow: marks tests as slow
+    integration: integration tests</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s7">7. Monkeypatch &amp; mocking</h2>
+        <p><code>monkeypatch</code> temporarily modifies attributes, dicts, env vars, or <code>sys.path</code>, then restores automatically.</p>
+        <pre><code class="language-python">import os
+
+def get_api_key():
+    return os.environ.get("API_KEY", "default")
+
+def test_api_key(monkeypatch):
+    monkeypatch.setenv("API_KEY", "secret123")
+    assert get_api_key() == "secret123"
+
+def test_chdir(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    assert tmp_path == __import__("pathlib").Path.cwd()
+
+def test_syspath(monkeypatch, tmp_path):
+    monkeypatch.syspath_prepend(str(tmp_path))
+    assert str(tmp_path) in __import__("sys").path</code></pre>
+        <p>Replace attributes with <code>monkeypatch.setattr</code>:</p>
+        <pre><code class="language-python">import requests
+
+def fetch_data(url):
+    return requests.get(url).json()
+
+def test_fetch_data(monkeypatch):
+    class MockResponse:
+        @staticmethod
+        def json(): return {"mocked": True}
+    def mock_get(*a, **k): return MockResponse()
+    monkeypatch.setattr(requests, "get", mock_get)
+    assert fetch_data("https://fake.com") == {"mocked": True}</code></pre>
+        <p>For deeper control use <code>unittest.mock</code> (built-in) or the <code>pytest-mock</code> plugin:</p>
+        <pre><code class="language-python">from unittest.mock import patch
+
+def test_with_patch():
+    with patch("requests.get") as mock_get:
+        mock_get.return_value.json.return_value = {"ok": True}
+        assert fetch_data("http://test") == {"ok": True}
+        mock_get.assert_called_once_with("http://test")</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s8">8. Built-in fixtures: tmp_path, capsys, caplog</h2>
+
+        <h3><code>tmp_path</code> — temporary directories</h3>
+        <pre><code class="language-python">def test_write_file(tmp_path):
+    file = tmp_path / "data.txt"
+    file.write_text("hello")
+    assert file.read_text() == "hello"
+
+def test_multiple_files(tmp_path):
+    (tmp_path / "a.txt").write_text("A")
+    (tmp_path / "b.txt").write_text("B")
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["a.txt", "b.txt"]</code></pre>
+        <p><code>tmp_path_factory</code> for session-scoped dirs. Legacy <code>tmpdir</code> (py.path) still exists — prefer <code>tmp_path</code>.</p>
+
+        <h3><code>capsys</code> — capture stdout / stderr</h3>
+        <pre><code class="language-python">import sys
+
+def test_print_output(capsys):
+    print("hello world")
+    print("this is stderr", file=sys.stderr)
+    captured = capsys.readouterr()
+    assert captured.out == "hello world\n"
+    assert "stderr" in captured.err</code></pre>
+        <p>Use <code>capfd</code> for file-descriptor-level output (C extensions).</p>
+
+        <h3><code>caplog</code> — capture logging</h3>
+        <pre><code class="language-python">import logging
+
+def test_logging(caplog):
+    logger = logging.getLogger("myapp")
+    with caplog.at_level(logging.WARNING):
+        logger.warning("something bad")
+        logger.info("ignored")
+    assert "something bad" in caplog.text
+    assert caplog.records[0].levelname == "WARNING"
+    assert caplog.records[0].name == "myapp"</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s9">9. pytest.approx &amp; warnings</h2>
+        <p><strong>Floating-point comparisons</strong> with tolerance:</p>
+        <pre><code class="language-python">import pytest
+
+def test_float_equality():
+    assert 0.1 + 0.2 == pytest.approx(0.3)
+    assert 0.1 + 0.2 == pytest.approx(0.3, abs=1e-9)
+    assert [0.1 + 0.2, 1.0] == pytest.approx([0.3, 1.0])
+    assert {"x": 0.1 + 0.2} == pytest.approx({"x": 0.3})
+    assert float("nan") == pytest.approx(float("nan"), nan_ok=True)</code></pre>
+        <p><strong>Testing warnings</strong>:</p>
+        <pre><code class="language-python">import warnings
+import pytest
+
+def old_function():
+    warnings.warn("this is deprecated", DeprecationWarning)
+
+def test_warning():
+    with pytest.warns(DeprecationWarning, match="deprecated"):
+        old_function()
+
+def test_deprecated():
+    with pytest.deprecated_call():
+        old_function()</code></pre>
+        <p>To ensure <em>no</em> warning is raised:</p>
+        <pre><code class="language-python">def test_no_warning():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        normal_function()</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s10">10. Configuration files</h2>
+        <p>pytest reads (first found, in priority order): <code>pytest.ini</code>, <code>pyproject.toml</code> (<code>[tool.pytest.ini_options]</code>), <code>tox.ini</code> (<code>[pytest]</code>), <code>setup.cfg</code> (<code>[tool:pytest]</code>).</p>
+        <pre><code class="language-toml"># pyproject.toml
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow",
+    "integration: integration tests",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]</code></pre>
+        <p>Equivalent <code>pytest.ini</code>:</p>
+        <pre><code class="language-ini">[pytest]
+addopts = -v --tb=short
+testpaths = tests
+markers =
+    slow: marks tests as slow
+    integration: integration tests</code></pre>
+        <div class="warning">⚠️ Only one config file is used per invocation. Check with <code>pytest --co -q</code> and <code>pytest --trace-config</code>. Rootdir is detected from the first of <code>pytest.ini</code>, <code>pyproject.toml</code>, <code>tox.ini</code>, <code>setup.py</code>, <code>setup.cfg</code>.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s11">11. Full <code>pytest.ini</code> options reference <span class="badge new">new</span></h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Option</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td><code>testpaths</code></td><td>Directories to search for tests</td></tr>
+                    <tr><td><code>norecursedirs</code></td><td>Directories to skip (default: <code>.*</code>, <code>build</code>, <code>dist</code>, <code>node_modules</code>, etc.)</td></tr>
+                    <tr><td><code>python_files</code></td><td>Glob patterns for test modules</td></tr>
+                    <tr><td><code>python_classes</code></td><td>Class name prefixes to collect</td></tr>
+                    <tr><td><code>python_functions</code></td><td>Function name prefixes to collect</td></tr>
+                    <tr><td><code>addopts</code></td><td>Default CLI args (e.g. <code>-ra -q</code>)</td></tr>
+                    <tr><td><code>log_cli</code></td><td>Stream logs to terminal live</td></tr>
+                    <tr><td><code>log_level</code></td><td>Log level for live logs</td></tr>
+                    <tr><td><code>log_format</code> / <code>log_date_format</code></td><td>Log formatting</td></tr>
+                    <tr><td><code>filterwarnings</code></td><td>Per-category warning filters</td></tr>
+                    <tr><td><code>markers</code></td><td>Register custom markers</td></tr>
+                    <tr><td><code>xfail_strict</code></td><td>XPASS becomes a failure</td></tr>
+                    <tr><td><code>pythonpath</code></td><td>Paths added to sys.path</td></tr>
+                    <tr><td><code>required_plugins</code></td><td>Fail early if plugins are missing</td></tr>
+                    <tr><td><code>--import-mode</code></td><td>See section 12</td></tr>
+                    <tr><td><code>--strict-markers</code></td><td>Unknown markers raise errors</td></tr>
+                    <tr><td><code>--strict-config</code></td><td>Unknown config keys raise errors</td></tr>
+                    <tr><td><code>--durations=N</code></td><td>Show N slowest tests</td></tr>
+                    <tr><td><code>--disable-warnings</code></td><td>Hide warning summary</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>Environment variable <code>PYTEST_ADDOPTS</code> appends CLI args — great for local preferences or CI overrides:</p>
+        <pre><code class="language-bash">PYTEST_ADDOPTS="-vv --pdb" pytest</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s12">12. Import modes &amp; the <code>__init__.py</code> question <span class="badge adv">advanced</span></h2>
+        <p>pytest has three import modes via <code>--import-mode</code>:</p>
+        <ul>
+            <li><strong>prepend</strong> (default) — inserts the test's directory at the front of <code>sys.path</code>. Simplest, but can shadow same-named modules across directories.</li>
+            <li><strong>append</strong> — inserts at the end. Only relevant if you need a specific resolution order.</li>
+            <li><strong>importlib</strong> — imports test modules by file path without touching <code>sys.path</code>. Requires <code>__init__.py</code> in test dirs to avoid module-name clashes.</li>
+        </ul>
+        <p><strong>Do you need <code>__init__.py</code> in tests?</strong></p>
+        <ul>
+            <li><em>Traditional project</em> (tests import from an installed package): no.</li>
+            <li><em>Same test module name in two folders</em>: yes, or use <code>--import-mode=importlib</code>.</li>
+            <li><em>Ship tests as a package</em>: yes.</li>
+        </ul>
+        <div class="note">📌 Default behaviour works for 90% of projects. Only reach for <code>--import-mode=importlib</code> when you hit "import file mismatch" errors.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s13">13. <code>conftest.py</code> hierarchy &amp; fixture override rules <span class="badge adv">advanced</span></h2>
+        <p><code>conftest.py</code> files are auto-discovered per directory. Fixtures defined there are available to <em>all tests below that directory</em> — no import needed.</p>
+        <div class="file-tree">
+            my_project/<br>
+            ├── conftest.py            <span class="dim"># session-wide fixtures</span><br>
+            ├── tests/<br>
+            │   ├── conftest.py        <span class="dim"># applies to tests/ and below</span><br>
+            │   ├── test_api.py<br>
+            │   └── integration/<br>
+            │       ├── conftest.py    <span class="dim"># only this subfolder</span><br>
+            │       └── test_db.py<br>
+        </div>
+        <p><strong>Override rules:</strong> a fixture with the same name in a deeper <code>conftest.py</code> overrides the outer one. Tests can also override per-module by defining a local fixture.</p>
+        <pre><code class="language-python"># tests/conftest.py
+import pytest
+
+@pytest.fixture
+def api_client():
+    return {"env": "test"}
+
+@pytest.fixture
+def db():
+    yield "real-db"</code></pre>
+        <pre><code class="language-python"># tests/integration/conftest.py — overrides for this folder
+import pytest
+
+@pytest.fixture
+def api_client():
+    return {"env": "integration"}
+
+@pytest.fixture
+def db():
+    yield "fake-db"</code></pre>
+        <pre><code class="language-python"># tests/test_api.py
+def test_env(api_client):
+    assert api_client["env"] == "test"</code></pre>
+        <pre><code class="language-python"># tests/integration/test_db.py
+def test_env(api_client):
+    assert api_client["env"] == "integration"</code></pre>
+        <div class="warning">⚠️ <code>conftest.py</code> is not a plugin — it can't be imported by arbitrary modules and isn't distributed with your package. For reusable fixtures, ship a plugin.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s14">14. Advanced fixtures &amp; the <code>request</code> object</h2>
+        <p>Fixtures can accept the special <code>request</code> fixture, exposing <code>request.param</code>, <code>request.cls</code>, <code>request.node</code>, <code>request.config</code>, and <code>request.addfinalizer</code>.</p>
+
+        <h3>Parametrizing fixtures</h3>
+        <pre><code class="language-python">@pytest.fixture(params=[1, 2, 3])
+def number(request):
+    return request.param
+
+def test_number_positive(number):
+    assert number > 0   # runs 3 times</code></pre>
+
+        <h3>Indirect parametrization</h3>
+        <pre><code class="language-python">@pytest.fixture
+def user(request):
+    return {"id": request.param, "name": f"User{request.param}"}
+
+@pytest.mark.parametrize("user", [1, 2], indirect=True)
+def test_user_id(user):
+    assert user["id"] in [1, 2]</code></pre>
+
+        <h3>Factory pattern (return a function from a fixture)</h3>
+        <pre><code class="language-python">@pytest.fixture
+def make_user():
+    def _make_user(name, age):
+        return {"name": name, "age": age}
+    return _make_user
+
+def test_multiple_users(make_user):
+    alice = make_user("Alice", 30)
+    bob = make_user("Bob", 25)
+    assert alice["name"] != bob["name"]</code></pre>
+
+        <h3>Finalization with <code>addfinalizer</code></h3>
+        <pre><code class="language-python">@pytest.fixture
+def resource(request):
+    r = {"status": "open"}
+    def teardown():
+        r["status"] = "closed"
+    request.addfinalizer(teardown)
+    return r
+
+def test_resource(resource):
+    assert resource["status"] == "open"</code></pre>
+        <div class="note">📌 <strong><code>yield</code> vs. <code>addfinalizer</code>:</strong> <code>yield</code> is cleaner for simple teardown. Use <code>addfinalizer</code> when you need conditional or multiple cleanup hooks.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s15">15. Class-based tests</h2>
+        <p>Group related tests in a class. <code>setup_method</code>/<code>teardown_method</code> run before/after each method; class-level variants are <code>setup_class</code>/<code>teardown_class</code>.</p>
+        <pre><code class="language-python">import pytest
+
+class Calculator:
+    def add(self, a, b): return a + b
+    def divide(self, a, b):
+        if b == 0: raise ValueError("division by zero")
+        return a / b
+
+class TestCalculator:
+    def setup_method(self):
+        self.calc = Calculator()
+
+    def test_add(self):
+        assert self.calc.add(1, 2) == 3
+
+    def test_divide(self):
+        assert self.calc.divide(10, 2) == 5.0
+
+    def test_divide_zero(self):
+        with pytest.raises(ValueError):
+            self.calc.divide(1, 0)</code></pre>
+        <div class="tip">💡 Prefer fixtures over <code>setup_method</code> — more composable. Class-based is useful for porting from <code>unittest</code>.</div>
+        <p>pytest runs <code>unittest.TestCase</code> subclasses too, so migration is gradual:</p>
+        <pre><code class="language-python">import unittest
+
+class TestLegacy(unittest.TestCase):
+    def test_equal(self):
+        self.assertEqual(2 + 2, 4)</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s16">16. Async testing</h2>
+        <pre><code class="language-bash">pip install pytest-asyncio</code></pre>
+        <pre><code class="language-python">import pytest
+import asyncio
+
+async def fetch_data():
+    await asyncio.sleep(0.01)
+    return {"value": 42}
+
+@pytest.mark.asyncio
+async def test_async_fetch():
+    result = await fetch_data()
+    assert result == {"value": 42}
+
+@pytest.fixture
+async def async_client():
+    client = {"connected": True}
+    yield client
+    client["connected"] = False
+
+@pytest.mark.asyncio
+async def test_with_async_fixture(async_client):
+    assert async_client["connected"] is True</code></pre>
+        <p>Automatic mode (no decorator needed):</p>
+        <pre><code class="language-toml">[tool.pytest.ini_options]
+asyncio_mode = "auto"</code></pre>
+        <div class="warning">⚠️ Alternative: <code>anyio</code>'s pytest plugin supports asyncio and trio backends. Both work; pick one.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s17">17. Doctests</h2>
+        <pre><code class="language-python">def add(a, b):
+    """
+    Add two numbers.
+
+    >>> add(2, 3)
+    5
+    >>> add(-1, 1)
+    0
+    """
+    return a + b</code></pre>
+        <pre><code class="language-bash">pytest --doctest-modules path/to/module.py</code></pre>
+        <p>Configure to always run them, or use globs for text files:</p>
+        <pre><code class="language-ini">[pytest]
+addopts = --doctest-modules --doctest-glob="*.md"</code></pre>
+        <p>Inject fixtures into the doctest namespace via <code>doctest_namespace</code>:</p>
+        <pre><code class="language-python">@pytest.fixture(autouse=True)
+def _add_to_doctest_namespace(doctest_namespace):
+    doctest_namespace["add"] = add</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s18">18. Debugging failing tests</h2>
+
+        <h3>Post-mortem debugging</h3>
+        <pre><code class="language-bash">pytest --pdb
+pytest --pdb --pdbcls=IPython.terminal.debugger:TerminalPdb
+pytest --trace                       # pdb at start of each test
+pytest -x                            # stop after first failure
+pytest --maxfail=2</code></pre>
+
+        <h3>Traceback styles</h3>
+        <pre><code class="language-bash">pytest --tb=auto      # default
+pytest --tb=long
+pytest --tb=short
+pytest --tb=line
+pytest --tb=native
+pytest --tb=no</code></pre>
+
+        <h3>Programmatic breakpoint</h3>
+        <pre><code class="language-python">def test_something():
+    x = compute()
+    pytest.set_trace()   # requires -s
+    assert x == 42</code></pre>
+        <p>Disable output capture with <code>-s</code>. See what would run without running it: <code>pytest --co</code>. See fixtures and markers registered: <code>pytest --fixtures</code>, <code>pytest --markers</code>. See fixture setup/teardown order: <code>pytest --setup-show</code>. See loaded plugins: <code>pytest --trace-config</code>. Find slow tests: <code>pytest --durations=10</code>.</p>
+
+        <!-- ===================================================== -->
+        <h2 id="s19">19. Running subsets — node ID syntax <span class="badge new">new</span></h2>
+        <p>Every test has a node ID. You can address any subset precisely:</p>
+        <pre><code class="language-bash"># single function
+pytest tests/test_calc.py::test_add
+
+# class + method
+pytest tests/test_calc.py::TestCalc::test_add
+
+# specific parametrized case
+pytest tests/test_calc.py::test_add[1-2]
+
+# keyword expressions
+pytest -k "add and not slow"
+pytest -k "TestCalc and divide"
+
+# by marker
+pytest -m "integration and not slow"
+
+# last failed / failed first
+pytest --lf
+pytest --ff
+
+# collect only (don't run)
+pytest --collect-only
+pytest --co -q     # quiet collection</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s20">20. Runtime helpers: skip, fail, xfail</h2>
+        <pre><code class="language-python">import pytest
+
+def test_conditional_skip():
+    if not has_network():
+        pytest.skip("no network available")
+    assert True
+
+def test_expected_failure():
+    if not feature_flag_enabled():
+        pytest.xfail("feature flag off")
+
+def test_explicit_fail():
+    if unexpected_condition():
+        pytest.fail("something went wrong", pytrace=False)
+
+# skip a whole module at import time
+pytestmark = pytest.mark.skipif(no_gpu(), reason="requires GPU")
+
+# fail based on environment
+if not os.environ.get("RUN_SLOW"):
+    pytestmark = pytest.mark.skip(reason="RUN_SLOW not set")</code></pre>
+        <p>Use <code>pytest.importorskip</code> for optional dependencies:</p>
+        <pre><code class="language-python">def test_numpy():
+    np = pytest.importorskip("numpy")
+    assert np.array([1, 2]).sum() == 3</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s21">21. Plugins that matter</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Plugin</th><th>What it does</th><th>Usage</th></tr></thead>
+                <tbody>
+                    <tr><td><code>pytest-cov</code></td><td>Coverage</td><td><code>pytest --cov=myapp --cov-report=html</code></td></tr>
+                    <tr><td><code>pytest-xdist</code></td><td>Parallel</td><td><code>pytest -n auto</code></td></tr>
+                    <tr><td><code>pytest-mock</code></td><td>Mocking wrapper</td><td><code>def test(mocker): mocker.patch(...)</code></td></tr>
+                    <tr><td><code>pytest-randomly</code></td><td>Shuffle test order</td><td>just install</td></tr>
+                    <tr><td><code>pytest-timeout</code></td><td>Kill hanging tests</td><td><code>pytest --timeout=10</code></td></tr>
+                    <tr><td><code>pytest-asyncio</code></td><td>Async support</td><td>See §16</td></tr>
+                    <tr><td><code>pytest-freezegun</code></td><td>Freeze time</td><td><code>@pytest.mark.freeze_time("2020-01-01")</code></td></tr>
+                    <tr><td><code>pytest-django</code></td><td>Django integration</td><td>See docs</td></tr>
+                    <tr><td><code>pytest-benchmark</code></td><td>Micro-benchmarks</td><td><code>def test(benchmark): benchmark(fn)</code></td></tr>
+                    <tr><td><code>pytest-html</code></td><td>HTML reports</td><td><code>pytest --html=report.html</code></td></tr>
+                    <tr><td><code>pytest-sugar</code></td><td>Prettier output</td><td>install and forget</td></tr>
+                    <tr><td><code>pytest-snapshot</code> / <code>syrupy</code></td><td>Snapshot testing</td><td>See docs</td></tr>
+                    <tr><td><code>pytest-forked</code></td><td>Run each test in a forked process</td><td><code>pytest --forked</code></td></tr>
+                    <tr><td><code>hypothesis</code></td><td>Property-based testing</td><td>See §23</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <pre><code class="language-python"># pytest-mock example
+def test_fetch(mocker):
+    mock_get = mocker.patch("requests.get")
+    mock_get.return_value.json.return_value = {"ok": True}
+    assert fetch_data("http://x") == {"ok": True}
+    mock_get.assert_called_once_with("http://x")</code></pre>
+        <pre><code class="language-bash">pytest -n auto --cov=myapp --cov-report=term-missing</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s22">22. Hooks &amp; writing your own plugin <span class="badge adv">advanced</span></h2>
+        <p>Hooks go in <code>conftest.py</code> or your own plugin module. The most-used ones:</p>
+        <pre><code class="language-python"># conftest.py
+import pytest
+
+def pytest_addoption(parser):
+    parser.addoption("--env", action="store", default="dev",
+                     help="target environment")
+
+@pytest.fixture
+def env(request):
+    return request.config.getoption("--env")
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "smoke: quick smoke tests")
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        if "integration" in item.nodeid:
+            item.add_marker(pytest.mark.integration)
+
+def pytest_report_teststatus(report):
+    # custom status character
+    if report.when == "call" and report.passed:
+        return report.outcome, "P", "PASSED"
+
+def pytest_sessionfinish(session, exitstatus):
+    print(f"\nsession finished with status {exitstatus}")</code></pre>
+        <p>CLI usage:</p>
+        <pre><code class="language-bash">pytest --env=prod</code></pre>
+
+        <h3>Writing a distributable plugin</h3>
+        <pre><code class="language-python"># myplugin.py
+def pytest_configure(config):
+    config.addinivalue_line("markers", "custom: my marker")</code></pre>
+        <pre><code class="language-toml"># pyproject.toml
+[project.entry-points.pytest11]
+myplugin = "myplugin"</code></pre>
+        <p>After <code>pip install -e .</code>, your plugin loads automatically. Verify with <code>pytest --trace-config</code>.</p>
+
+        <!-- ===================================================== -->
+        <h2 id="s23">23. Property-based testing with Hypothesis <span class="badge adv">advanced</span></h2>
+        <pre><code class="language-bash">pip install hypothesis</code></pre>
+        <pre><code class="language-python">from hypothesis import given, strategies as st
+
+@given(st.integers(), st.integers())
+def test_add_commutative(a, b):
+    assert a + b == b + a
+
+@given(st.lists(st.integers()))
+def test_sorted_is_ordered(xs):
+    assert all(sorted(xs)[i] <= sorted(xs)[i+1] for i in range(len(xs)-1))</code></pre>
+        <p>Hypothesis generates hundreds of inputs (including edge cases) and shrinks failures to the smallest reproducer. Combine with pytest's normal fixtures.</p>
+
+        <!-- ===================================================== -->
+        <h2 id="s24">24. Test taxonomy: unit / integration / e2e / smoke</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Type</th><th>Scope</th><th>Speed</th><th>Marker</th></tr></thead>
+                <tbody>
+                    <tr><td>Unit</td><td>One function / class in isolation</td><td>ms</td><td><code>@pytest.mark.unit</code></td></tr>
+                    <tr><td>Integration</td><td>A few components together (DB, HTTP)</td><td>100ms–s</td><td><code>@pytest.mark.integration</code></td></tr>
+                    <tr><td>End-to-end</td><td>Whole system, real entry point</td><td>s–min</td><td><code>@pytest.mark.e2e</code></td></tr>
+                    <tr><td>Smoke</td><td>Fast subset that must never fail</td><td>seconds</td><td><code>@pytest.mark.smoke</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>Register markers in config, then run only what you need:</p>
+        <pre><code class="language-bash">pytest -m unit          # fast local loop
+pytest -m "smoke"       # pre-commit / pre-push
+pytest -m "not e2e"     # CI fast lane
+pytest -m e2e           # nightly</code></pre>
+
+        <!-- ===================================================== -->
+        <h2 id="s25">25. Anti-patterns &amp; pitfalls</h2>
+
+        <h3>❌ Test interdependence</h3>
+        <pre><code class="language-python"># BAD — test_b assumes test_a ran
+counter = 0
+def test_a(): global counter; counter += 1
+def test_b(): assert counter == 1
+
+# GOOD — each test is self-contained
+def increment(n): return n + 1
+
+def test_a(): assert increment(0) == 1
+def test_b(): assert increment(0) == 1</code></pre>
+
+        <h3>❌ Module-scoped mutable state leaking</h3>
+        <pre><code class="language-python"># BAD — mutations leak across tests
+@pytest.fixture(scope="module")
+def shared_list():
+    return []
+
+# GOOD — copy, or use function scope
+@pytest.fixture(scope="module")
+def shared_list():
+    data = []
+    yield data
+    data.clear()</code></pre>
+
+        <h3>❌ Over-mocking</h3>
+        <p>If you mock everything, you're testing your mocks. Mock only at boundaries (network, DB, filesystem). Prefer fakes for simple cases.</p>
+
+        <h3>❌ Slow fixtures without broader scope</h3>
+        <p>A 500ms DB connection recreated per test adds up fast. Use <code>scope="module"</code> or <code>"session"</code> if tests don't mutate shared state.</p>
+
+        <h3>❌ Many unrelated asserts in one test</h3>
+        <p>The first failure hides the rest. Prefer one logical assertion per test, or use <code>parametrize</code>.</p>
+
+        <h3>❌ Relying on <code>print()</code></h3>
+        <p>Use <code>capsys</code> / <code>caplog</code> so tests can assert on output.</p>
+
+        <h3>❌ Assuming assert order doesn't matter</h3>
+        <p>pytest's rewriting shows you values — but only for the first failed assert in a statement chain. Keep each statement focused.</p>
+
+        <!-- ===================================================== -->
+        <h2 id="s26">26. Common errors → fixes <span class="badge new">new</span></h2>
+
+        <div class="err">
+            <strong>ModuleNotFoundError: No module named 'myapp'</strong>
+            <p>Test file can't find your package. Fix with one of:</p>
+            <ul>
+                <li><code>pip install -e .</code> (recommended)</li>
+                <li>Add <code>pythonpath = ["src"]</code> to <code>pyproject.toml</code> under <code>[tool.pytest.ini_options]</code></li>
+                <li>Add a <code>conftest.py</code> at the repo root (pytest inserts rootdir on <code>sys.path</code>)</li>
+            </ul>
+        </div>
+
+        <div class="err">
+            <strong>import file mismatch: imported module 'test_x' has this __file__ attribute...</strong>
+            <p>Two test modules share a name across folders. Fix:</p>
+            <ul>
+                <li>Add <code>__init__.py</code> to test folders, or</li>
+                <li>Run <code>pytest --import-mode=importlib</code></li>
+            </ul>
+        </div>
+
+        <div class="err">
+            <strong>PytestUnknownMarkWarning: Unknown pytest.mark.slow</strong>
+            <p>Register custom marks in config:</p>
+            <pre><code class="language-ini">[pytest]
+markers =
+    slow: marks tests as slow</code></pre>
+            <p>Or run with <code>--strict-markers</code> to make it an error.</p>
+        </div>
+
+        <div class="err">
+            <strong>fixture 'xyz' not found</strong>
+            <p>Check: spelling, that the fixture is defined in this file / a conftest.py above, and that <code>@pytest.fixture</code> decorator is present.</p>
+        </div>
+
+        <div class="err">
+            <strong>ScopeMismatch: You tried to access a 'function' scoped fixture from a 'module' scoped fixture</strong>
+            <p>A wider-scope fixture requested a narrower one. Fix: broaden the inner fixture's scope, or restructure so the narrower fixture requests the wider one.</p>
+        </div>
+
+        <div class="err">
+            <strong>RuntimeError: no running event loop</strong>
+            <p>Async test without <code>@pytest.mark.asyncio</code> (or <code>asyncio_mode = "auto"</code>). See §16.</p>
+        </div>
+
+        <div class="err">
+            <strong>DeprecationWarning: pytest.warns(None) is deprecated</strong>
+            <p>Use <code>warnings.catch_warnings()</code> with <code>warnings.simplefilter("error")</code> instead. See §9.</p>
+        </div>
+
+        <div class="err">
+            <strong>Tests pass individually but fail together</strong>
+            <p>State leaks between tests. Run <code>pytest -p no:randomly --lf</code>, or install <code>pytest-randomly</code> to catch ordering issues. Look for module-level globals, shared fixtures with <code>scope="module"</code>, or mutated default arguments.</p>
+        </div>
+
+        <!-- ===================================================== -->
+        <h2 id="s27">27. CI with GitHub Actions</h2>
+        <pre><code class="language-yaml"># .github/workflows/test.yml
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      - name: Run tests with coverage
+        run: pytest --cov=myapp --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml</code></pre>
+        <p>Badges in your README:</p>
+        <pre><code class="language-markdown">![tests](https://github.com/USER/REPO/actions/workflows/test.yml/badge.svg)
+[![codecov](https://codecov.io/gh/USER/REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/USER/REPO)</code></pre>
+        <div class="tip">💡 Cache pip, cache <code>.pytest_cache</code>, and use <code>pytest-xdist -n auto</code> for large suites.</div>
+
+        <!-- ===================================================== -->
+        <h2 id="s28">28. Real-world example: a calculator library</h2>
+        <div class="file-tree">
+            my_project/<br>
+            ├── src/myapp/<br>
+            │   ├── __init__.py<br>
+            │   └── calculator.py<br>
+            ├── tests/<br>
+            │   ├── __init__.py<br>
+            │   ├── conftest.py<br>
+            │   ├── test_calculator.py<br>
+            │   └── test_cli.py<br>
+            ├── pyproject.toml<br>
+            └── .github/workflows/test.yml
+        </div>
+        <pre><code class="language-python"># src/myapp/calculator.py
+class Calculator:
+    def add(self, a, b):
+        return a + b
+    def divide(self, a, b):
+        if b == 0:
+            raise ValueError("Division by zero")
+        return a / b
+    def is_positive(self, n):
+        return n > 0</code></pre>
+        <pre><code class="language-python"># tests/conftest.py
+import pytest
+from myapp.calculator import Calculator
+
+@pytest.fixture
+def calc():
+    return Calculator()
+
+@pytest.fixture
+def fixture_file(tmp_path):
+    f = tmp_path / "input.txt"
+    f.write_text("1\n2\n3\n")
+    return f</code></pre>
+        <pre><code class="language-python"># tests/test_calculator.py
+import pytest
+
+@pytest.mark.parametrize("a, b, expected", [
+    (2, 3, 5),
+    (-1, 1, 0),
+    (0, 0, 0),
+    (100, -50, 50),
+])
+def test_add(calc, a, b, expected):
+    assert calc.add(a, b) == expected
+
+def test_divide(calc):
+    assert calc.divide(10, 2) == 5.0
+
+def test_divide_by_zero(calc):
+    with pytest.raises(ValueError, match="Division by zero"):
+        calc.divide(5, 0)
+
+@pytest.mark.parametrize("n, expected", [
+    (5, True), (-3, False), (0, False), (0.001, True)
+])
+def test_is_positive(calc, n, expected):
+    assert calc.is_positive(n) == expected
+
+def test_read_input_file(fixture_file):
+    numbers = [int(line) for line in fixture_file.read_text().splitlines()]
+    assert numbers == [1, 2, 3]</code></pre>
+        <pre><code class="language-python"># tests/test_cli.py
+def test_cli_prints_result(capsys, calc):
+    print(calc.add(2, 3))
+    captured = capsys.readouterr()
+    assert captured.out == "5\n"</code></pre>
+        <pre><code class="language-bash">pytest --cov=src/myapp --cov-report=term-missing -v</code></pre>
+
+        <!-- ===================================================== -->
+        <hr>
+        <h2 id="cheatsheet">Quick reference cheatsheet</h2>
+
+        <h3>Commands</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Command</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>pytest</code></td><td>Run all tests</td></tr>
+                    <tr><td><code>pytest -v</code> / <code>-q</code></td><td>Verbose / quiet</td></tr>
+                    <tr><td><code>pytest -k "expr"</code></td><td>Keyword filter</td></tr>
+                    <tr><td><code>pytest -m marker</code></td><td>Marker filter</td></tr>
+                    <tr><td><code>pytest file.py::test_fn</code></td><td>Node ID selection</td></tr>
+                    <tr><td><code>pytest -x</code> / <code>--maxfail=N</code></td><td>Stop early</td></tr>
+                    <tr><td><code>pytest --lf</code> / <code>--ff</code></td><td>Last failed / failed first</td></tr>
+                    <tr><td><code>pytest -s</code></td><td>No output capture</td></tr>
+                    <tr><td><code>pytest --pdb</code></td><td>Debug on failure</td></tr>
+                    <tr><td><code>pytest --tb=short</code></td><td>Traceback style</td></tr>
+                    <tr><td><code>pytest --co</code></td><td>Collect only</td></tr>
+                    <tr><td><code>pytest --fixtures</code></td><td>List fixtures</td></tr>
+                    <tr><td><code>pytest --markers</code></td><td>List markers</td></tr>
+                    <tr><td><code>pytest --setup-show</code></td><td>Fixture setup order</td></tr>
+                    <tr><td><code>pytest --durations=10</code></td><td>Slowest tests</td></tr>
+                    <tr><td><code>pytest --trace-config</code></td><td>Loaded plugins</td></tr>
+                    <tr><td><code>pytest --cov=pkg</code></td><td>Coverage (pytest-cov)</td></tr>
+                    <tr><td><code>pytest -n auto</code></td><td>Parallel (pytest-xdist)</td></tr>
+                    <tr><td><code>pytest --doctest-modules</code></td><td>Run doctests</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Fixtures &amp; features</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Feature</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td><code>@pytest.fixture</code></td><td>Define a fixture</td></tr>
+                    <tr><td><code>scope=</code></td><td>function / class / module / package / session</td></tr>
+                    <tr><td><code>autouse=True</code></td><td>Apply without injection</td></tr>
+                    <tr><td><code>params=</code></td><td>Parametrize the fixture</td></tr>
+                    <tr><td><code>ids=</code></td><td>Readable param names</td></tr>
+                    <tr><td><code>request.param</code></td><td>Current param value</td></tr>
+                    <tr><td><code>request.addfinalizer</code></td><td>Register teardown</td></tr>
+                    <tr><td><code>yield</code></td><td>Setup + teardown</td></tr>
+                    <tr><td><code>@pytest.mark.parametrize</code></td><td>Parametrize test</td></tr>
+                    <tr><td><code>indirect=True</code></td><td>Send params through a fixture</td></tr>
+                    <tr><td><code>pytest.param(..., marks=...)</code></td><td>Per-case marks</td></tr>
+                    <tr><td><code>pytest.approx</code></td><td>Float tolerance</td></tr>
+                    <tr><td><code>pytest.raises</code></td><td>Expect exception</td></tr>
+                    <tr><td><code>pytest.warns</code></td><td>Expect warning</td></tr>
+                    <tr><td><code>pytest.skip</code> / <code>xfail</code> / <code>fail</code></td><td>Runtime control</td></tr>
+                    <tr><td><code>tmp_path</code></td><td>Temp directory</td></tr>
+                    <tr><td><code>capsys</code> / <code>capfd</code></td><td>Capture stdout/stderr</td></tr>
+                    <tr><td><code>caplog</code></td><td>Capture logging</td></tr>
+                    <tr><td><code>monkeypatch</code></td><td>Env, attrs, syspath, chdir</td></tr>
+                    <tr><td><code>doctest_namespace</code></td><td>Inject into doctest</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Markers</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Marker</th><th>Effect</th></tr></thead>
+                <tbody>
+                    <tr><td><code>@pytest.mark.skip</code></td><td>Always skip</td></tr>
+                    <tr><td><code>@pytest.mark.skipif(cond, reason=...)</code></td><td>Skip conditionally</td></tr>
+                    <tr><td><code>@pytest.mark.xfail</code></td><td>Expected failure</td></tr>
+                    <tr><td><code>@pytest.mark.slow</code></td><td>Custom, selectable</td></tr>
+                    <tr><td><code>@pytest.mark.asyncio</code></td><td>Async test</td></tr>
+                    <tr><td><code>@pytest.mark.parametrize</code></td><td>Parametrize</td></tr>
+                    <tr><td><code>@pytest.mark.usefixtures("f")</code></td><td>Apply fixture without arg</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Complete pytest tutorial</strong> · beginner → advanced · 28 sections · every example runnable</p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem;">Fork, host on GitHub Pages, help others learn pytest.</p>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+    hljs.highlightAll();
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const current = html.getAttribute('data-theme') || 'light';
+        const next = current === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', next);
+        document.querySelector('.theme-toggle').textContent = next === 'light' ? '🌙' : '☀️';
+        localStorage.setItem('theme', next);
+    }
+
+    // Load saved theme
+    (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+    })();
+</script>
+</body>
+</html>
