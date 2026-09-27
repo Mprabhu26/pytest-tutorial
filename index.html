@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pytest: zero to hero · complete reference tutorial</title>
-    <meta name="description" content="The complete beginner → advanced pytest tutorial. Every fixture, every mark, every hook, every config option — with runnable examples.">
+    <title>pytest: zero to hero · complete reference tutorial + interview questions</title>
+    <meta name="description" content="The complete beginner → advanced pytest tutorial with 100+ examples and 60+ interview questions. Every fixture, mark, hook, config option.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -209,9 +209,11 @@
         }
         .badge.new { background: #dcfce7; color: #166534; }
         .badge.adv { background: #fef3c7; color: #92400e; }
+        .badge.iq { background: #ede9fe; color: #5b21b6; }
         [data-theme="dark"] .badge { background: #1e3a8a; color: #bfdbfe; }
         [data-theme="dark"] .badge.new { background: #14532d; color: #bbf7d0; }
         [data-theme="dark"] .badge.adv { background: #78350f; color: #fde68a; }
+        [data-theme="dark"] .badge.iq { background: #4c1d95; color: #ddd6fe; }
         .note, .tip, .warning {
             padding: 1rem 1.5rem;
             border-radius: 0.75rem;
@@ -277,6 +279,57 @@
         }
         [data-theme="dark"] .err { background: #450a0a; border-left-color: #dc2626; color: #fecaca; }
         .err code { color: inherit; background: rgba(0,0,0,0.1); border: none; }
+
+        /* Interview question styles */
+        details {
+            background: var(--border-soft);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin: 0.75rem 0;
+            border: 1px solid var(--border);
+        }
+        details[open] { background: var(--card); }
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            list-style: none;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary::before {
+            content: "▸";
+            color: var(--accent);
+            font-weight: 700;
+            transition: transform 0.15s;
+            flex-shrink: 0;
+        }
+        details[open] summary::before { transform: rotate(90deg); }
+        details > *:not(summary) { margin-top: 0.75rem; }
+        .qnum {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            margin-right: 0.4rem;
+            vertical-align: middle;
+        }
+        .iq-legend {
+            background: var(--border-soft);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0 2rem;
+            font-size: 0.9rem;
+        }
+        .iq-legend span { display: inline-block; margin-right: 1rem; }
+        .level-easy::before { content: "🟢 "; }
+        .level-mid::before { content: "🟡 "; }
+        .level-hard::before { content: "🔴 "; }
     </style>
 </head>
 <body>
@@ -316,13 +369,20 @@
         <a href="#s21">21. Plugins that matter</a>
         <a href="#s22">22. Hooks &amp; custom plugins</a>
         <a href="#s23">23. Property-based testing</a>
+        <h4>Modern pytest</h4>
+        <a href="#s24">24. Sub-tests</a>
+        <a href="#s25">25. Native TOML config</a>
+        <a href="#s26">26. Fixture behavior &amp; CLI args</a>
+        <a href="#s27">27. Flaky test mitigation</a>
+        <a href="#s28">28. Programmatic pytest</a>
         <h4>Quality &amp; CI</h4>
-        <a href="#s24">24. Test taxonomy</a>
-        <a href="#s25">25. Anti-patterns</a>
-        <a href="#s26">26. Common errors → fixes</a>
-        <a href="#s27">27. CI with GitHub Actions</a>
+        <a href="#s29">29. Test taxonomy</a>
+        <a href="#s30">30. Anti-patterns</a>
+        <a href="#s31">31. Common errors → fixes</a>
+        <a href="#s32">32. CI with GitHub Actions</a>
         <h4>Putting it together</h4>
-        <a href="#s28">28. Real-world example</a>
+        <a href="#s33">33. Real-world example</a>
+        <a href="#interview">🎤 Interview questions</a>
         <a href="#cheatsheet">Cheatsheet</a>
     </aside>
 
@@ -330,15 +390,16 @@
     <main class="container">
 
         <h1>pytest: zero to hero</h1>
-        <div class="subhead">The complete beginner → advanced pytest reference. Every fixture, mark, hook, and config option — with runnable examples.</div>
+        <div class="subhead">The complete beginner → advanced pytest reference + <strong>60+ interview questions</strong>. Every fixture, mark, hook, and config option — with runnable examples.</div>
         <div class="meta">
-            <span class="badge">28 sections</span>
-            <span class="badge">100+ examples</span>
+            <span class="badge">33 sections</span>
+            <span class="badge iq">60+ interview Q&amp;A</span>
+            <span class="badge">150+ examples</span>
             <span class="badge">runnable</span>
             <span class="badge">no fluff</span>
         </div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 1 =================== -->
         <h2 id="s1">1. Setup &amp; first test</h2>
         <p>Install pytest (preferably inside a virtual environment):</p>
         <pre><code class="language-bash">pip install pytest</code></pre>
@@ -357,7 +418,7 @@ test_sample.py::test_arithmetic PASSED
 ============================== 2 passed in 0.02s ===============================</code></pre>
         <div class="tip">💡 Use <code>pytest -v</code> (verbose) / <code>-q</code> (quiet). Running plain <code>pytest</code> discovers everything below the current directory.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 2 =================== -->
         <h2 id="s2">2. Assertions &amp; expected exceptions</h2>
         <p>pytest uses Python's built-in <code>assert</code> but adds rich introspection. Failed assertions show a diff of actual vs. expected values.</p>
         <pre><code class="language-python">def test_failure_demo():
@@ -392,7 +453,7 @@ def test_group():
         raises_group()
     assert len(exc.value.exceptions) == 2</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 3 =================== -->
         <h2 id="s3">3. Assertion rewriting — the magic explained <span class="badge adv">advanced</span></h2>
         <p>pytest rewrites the AST of every test module before execution. That's why:</p>
         <ul>
@@ -409,7 +470,7 @@ def test_group():
         <p>Disable with <code>--assert=plain</code> (rarely useful) or per-module with <code>PYTEST_DONT_REWRITE</code>.</p>
         <div class="note">📌 Assertion rewriting does <strong>not</strong> work inside <code>exec()</code>, <code>eval()</code>, or list/generator comprehensions on some Python versions. Keep assertions simple.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 4 =================== -->
         <h2 id="s4">4. Fixtures — the heart of pytest</h2>
         <p>Fixtures provide a baseline for tests: data, connections, temp files, or anything reusable. Defined with <code>@pytest.fixture</code>, injected by name.</p>
         <pre><code class="language-python">import pytest
@@ -453,7 +514,7 @@ def test_client(api_client):
 
         <div class="tip">🔁 <strong>Autouse:</strong> <code>@pytest.fixture(autouse=True)</code> applies a fixture to every test in scope without explicit injection. Use <code>--setup-show</code> to see the order.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 5 =================== -->
         <h2 id="s5">5. Parametrization — one test, many cases</h2>
         <pre><code class="language-python">import pytest
 
@@ -496,7 +557,7 @@ def pytest_generate_tests(metafunc):
     if "value" in metafunc.fixturenames:
         metafunc.parametrize("value", [10, 20, 30])</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 6 =================== -->
         <h2 id="s6">6. Marks: skip, xfail, and custom</h2>
         <ul>
             <li><code>@pytest.mark.skip</code> — always skip.</li>
@@ -527,7 +588,20 @@ markers =
     slow: marks tests as slow
     integration: integration tests</code></pre>
 
-        <!-- ===================================================== -->
+        <h3><code>@pytest.mark.usefixtures</code></h3>
+        <p>Apply a fixture without receiving its return value (useful for setup-only fixtures):</p>
+        <pre><code class="language-python">@pytest.fixture
+def reset_db():
+    db.clear()
+    yield
+    db.clear()
+
+@pytest.mark.usefixtures("reset_db")
+def test_something():
+    # reset_db runs but we don't need its value
+    assert True</code></pre>
+
+        <!-- =================== 7 =================== -->
         <h2 id="s7">7. Monkeypatch &amp; mocking</h2>
         <p><code>monkeypatch</code> temporarily modifies attributes, dicts, env vars, or <code>sys.path</code>, then restores automatically.</p>
         <pre><code class="language-python">import os
@@ -568,7 +642,7 @@ def test_with_patch():
         assert fetch_data("http://test") == {"ok": True}
         mock_get.assert_called_once_with("http://test")</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 8 =================== -->
         <h2 id="s8">8. Built-in fixtures: tmp_path, capsys, caplog</h2>
 
         <h3><code>tmp_path</code> — temporary directories</h3>
@@ -606,7 +680,7 @@ def test_logging(caplog):
     assert caplog.records[0].levelname == "WARNING"
     assert caplog.records[0].name == "myapp"</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 9 =================== -->
         <h2 id="s9">9. pytest.approx &amp; warnings</h2>
         <p><strong>Floating-point comparisons</strong> with tolerance:</p>
         <pre><code class="language-python">import pytest
@@ -637,7 +711,7 @@ def test_deprecated():
         warnings.simplefilter("error")
         normal_function()</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 10 =================== -->
         <h2 id="s10">10. Configuration files</h2>
         <p>pytest reads (first found, in priority order): <code>pytest.ini</code>, <code>pyproject.toml</code> (<code>[tool.pytest.ini_options]</code>), <code>tox.ini</code> (<code>[pytest]</code>), <code>setup.cfg</code> (<code>[tool:pytest]</code>).</p>
         <pre><code class="language-toml"># pyproject.toml
@@ -665,7 +739,7 @@ markers =
     integration: integration tests</code></pre>
         <div class="warning">⚠️ Only one config file is used per invocation. Check with <code>pytest --co -q</code> and <code>pytest --trace-config</code>. Rootdir is detected from the first of <code>pytest.ini</code>, <code>pyproject.toml</code>, <code>tox.ini</code>, <code>setup.py</code>, <code>setup.cfg</code>.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 11 =================== -->
         <h2 id="s11">11. Full <code>pytest.ini</code> options reference <span class="badge new">new</span></h2>
         <div class="table-wrap">
             <table>
@@ -696,7 +770,7 @@ markers =
         <p>Environment variable <code>PYTEST_ADDOPTS</code> appends CLI args — great for local preferences or CI overrides:</p>
         <pre><code class="language-bash">PYTEST_ADDOPTS="-vv --pdb" pytest</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 12 =================== -->
         <h2 id="s12">12. Import modes &amp; the <code>__init__.py</code> question <span class="badge adv">advanced</span></h2>
         <p>pytest has three import modes via <code>--import-mode</code>:</p>
         <ul>
@@ -712,7 +786,7 @@ markers =
         </ul>
         <div class="note">📌 Default behaviour works for 90% of projects. Only reach for <code>--import-mode=importlib</code> when you hit "import file mismatch" errors.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 13 =================== -->
         <h2 id="s13">13. <code>conftest.py</code> hierarchy &amp; fixture override rules <span class="badge adv">advanced</span></h2>
         <p><code>conftest.py</code> files are auto-discovered per directory. Fixtures defined there are available to <em>all tests below that directory</em> — no import needed.</p>
         <div class="file-tree">
@@ -754,7 +828,7 @@ def test_env(api_client):
     assert api_client["env"] == "integration"</code></pre>
         <div class="warning">⚠️ <code>conftest.py</code> is not a plugin — it can't be imported by arbitrary modules and isn't distributed with your package. For reusable fixtures, ship a plugin.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 14 =================== -->
         <h2 id="s14">14. Advanced fixtures &amp; the <code>request</code> object</h2>
         <p>Fixtures can accept the special <code>request</code> fixture, exposing <code>request.param</code>, <code>request.cls</code>, <code>request.node</code>, <code>request.config</code>, and <code>request.addfinalizer</code>.</p>
 
@@ -800,7 +874,7 @@ def test_resource(resource):
     assert resource["status"] == "open"</code></pre>
         <div class="note">📌 <strong><code>yield</code> vs. <code>addfinalizer</code>:</strong> <code>yield</code> is cleaner for simple teardown. Use <code>addfinalizer</code> when you need conditional or multiple cleanup hooks.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 15 =================== -->
         <h2 id="s15">15. Class-based tests</h2>
         <p>Group related tests in a class. <code>setup_method</code>/<code>teardown_method</code> run before/after each method; class-level variants are <code>setup_class</code>/<code>teardown_class</code>.</p>
         <pre><code class="language-python">import pytest
@@ -832,7 +906,7 @@ class TestLegacy(unittest.TestCase):
     def test_equal(self):
         self.assertEqual(2 + 2, 4)</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 16 =================== -->
         <h2 id="s16">16. Async testing</h2>
         <pre><code class="language-bash">pip install pytest-asyncio</code></pre>
         <pre><code class="language-python">import pytest
@@ -861,7 +935,7 @@ async def test_with_async_fixture(async_client):
 asyncio_mode = "auto"</code></pre>
         <div class="warning">⚠️ Alternative: <code>anyio</code>'s pytest plugin supports asyncio and trio backends. Both work; pick one.</div>
 
-        <!-- ===================================================== -->
+        <!-- =================== 17 =================== -->
         <h2 id="s17">17. Doctests</h2>
         <pre><code class="language-python">def add(a, b):
     """
@@ -882,7 +956,7 @@ addopts = --doctest-modules --doctest-glob="*.md"</code></pre>
 def _add_to_doctest_namespace(doctest_namespace):
     doctest_namespace["add"] = add</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 18 =================== -->
         <h2 id="s18">18. Debugging failing tests</h2>
 
         <h3>Post-mortem debugging</h3>
@@ -907,7 +981,7 @@ pytest --tb=no</code></pre>
     assert x == 42</code></pre>
         <p>Disable output capture with <code>-s</code>. See what would run without running it: <code>pytest --co</code>. See fixtures and markers registered: <code>pytest --fixtures</code>, <code>pytest --markers</code>. See fixture setup/teardown order: <code>pytest --setup-show</code>. See loaded plugins: <code>pytest --trace-config</code>. Find slow tests: <code>pytest --durations=10</code>.</p>
 
-        <!-- ===================================================== -->
+        <!-- =================== 19 =================== -->
         <h2 id="s19">19. Running subsets — node ID syntax <span class="badge new">new</span></h2>
         <p>Every test has a node ID. You can address any subset precisely:</p>
         <pre><code class="language-bash"># single function
@@ -934,7 +1008,7 @@ pytest --ff
 pytest --collect-only
 pytest --co -q     # quiet collection</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 20 =================== -->
         <h2 id="s20">20. Runtime helpers: skip, fail, xfail</h2>
         <pre><code class="language-python">import pytest
 
@@ -962,7 +1036,7 @@ if not os.environ.get("RUN_SLOW"):
     np = pytest.importorskip("numpy")
     assert np.array([1, 2]).sum() == 3</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 21 =================== -->
         <h2 id="s21">21. Plugins that matter</h2>
         <div class="table-wrap">
             <table>
@@ -981,6 +1055,14 @@ if not os.environ.get("RUN_SLOW"):
                     <tr><td><code>pytest-sugar</code></td><td>Prettier output</td><td>install and forget</td></tr>
                     <tr><td><code>pytest-snapshot</code> / <code>syrupy</code></td><td>Snapshot testing</td><td>See docs</td></tr>
                     <tr><td><code>pytest-forked</code></td><td>Run each test in a forked process</td><td><code>pytest --forked</code></td></tr>
+                    <tr><td><code>pytest-env</code></td><td>Set env vars in config</td><td><code>[pytest] env = KEY=value</code></td></tr>
+                    <tr><td><code>pytest-order</code></td><td>Control test order</td><td><code>@pytest.mark.order(1)</code></td></tr>
+                    <tr><td><code>pytest-datadir</code></td><td>Per-test data folders</td><td><code>datadir</code> fixture</td></tr>
+                    <tr><td><code>pytest-lazy-fixture</code></td><td>Use fixtures in parametrize</td><td><code>pytest.lazy_fixture("name")</code></td></tr>
+                    <tr><td><code>pytest-dependency</code></td><td>Test dependencies</td><td><code>@pytest.mark.dependency(depends=["a"])</code></td></tr>
+                    <tr><td><code>pytest-icdiff</code></td><td>Colored diffs on failure</td><td>install and forget</td></tr>
+                    <tr><td><code>pytest-check</code></td><td>Multiple failures per test</td><td><code>check.equal(a, b)</code></td></tr>
+                    <tr><td><code>pytest-rich</code></td><td>Rich-formatted output</td><td>install and forget</td></tr>
                     <tr><td><code>hypothesis</code></td><td>Property-based testing</td><td>See §23</td></tr>
                 </tbody>
             </table>
@@ -993,7 +1075,7 @@ def test_fetch(mocker):
     mock_get.assert_called_once_with("http://x")</code></pre>
         <pre><code class="language-bash">pytest -n auto --cov=myapp --cov-report=term-missing</code></pre>
 
-        <!-- ===================================================== -->
+        <!-- =================== 22 =================== -->
         <h2 id="s22">22. Hooks &amp; writing your own plugin <span class="badge adv">advanced</span></h2>
         <p>Hooks go in <code>conftest.py</code> or your own plugin module. The most-used ones:</p>
         <pre><code class="language-python"># conftest.py
@@ -1034,7 +1116,7 @@ def pytest_configure(config):
 myplugin = "myplugin"</code></pre>
         <p>After <code>pip install -e .</code>, your plugin loads automatically. Verify with <code>pytest --trace-config</code>.</p>
 
-        <!-- ===================================================== -->
+        <!-- =================== 23 =================== -->
         <h2 id="s23">23. Property-based testing with Hypothesis <span class="badge adv">advanced</span></h2>
         <pre><code class="language-bash">pip install hypothesis</code></pre>
         <pre><code class="language-python">from hypothesis import given, strategies as st
@@ -1048,8 +1130,187 @@ def test_sorted_is_ordered(xs):
     assert all(sorted(xs)[i] <= sorted(xs)[i+1] for i in range(len(xs)-1))</code></pre>
         <p>Hypothesis generates hundreds of inputs (including edge cases) and shrinks failures to the smallest reproducer. Combine with pytest's normal fixtures.</p>
 
-        <!-- ===================================================== -->
-        <h2 id="s24">24. Test taxonomy: unit / integration / e2e / smoke</h2>
+        <!-- =================== 24 =================== -->
+        <h2 id="s24">24. Sub-tests — multiple failures per test <span class="badge new">new</span></h2>
+        <p>Traditionally, when the first assertion in a loop fails, the rest never run. Sub-tests solve this — each iteration is reported separately, and all failures are shown at once.</p>
+
+        <h3>Option A: Native (pytest 8.4+)</h3>
+        <pre><code class="language-python">import pytest
+
+def test_files_have_docstrings(subtests):
+    for path in Path.cwd().glob("*.py"):
+        with subtests.test(path=str(path)):
+            assert path.read_text().startswith('"""')</code></pre>
+
+        <h3>Option B: <code>pytest-subtests</code> plugin (backwards compatible)</h3>
+        <pre><code class="language-bash">pip install pytest-subtests</code></pre>
+        <pre><code class="language-python">def test_many_assertions(subtests):
+    for i in range(5):
+        with subtests.test(msg="checking", i=i):
+            assert i % 2 == 0  # shows ALL failures at once</code></pre>
+        <div class="tip">💡 Use sub-tests when iterating over files, records, or parameters that are <em>not</em> known at collection time. For known values, prefer <code>@pytest.mark.parametrize</code>.</div>
+
+        <!-- =================== 25 =================== -->
+        <h2 id="s25">25. Native TOML config (pytest 9+) <span class="badge new">new</span></h2>
+        <p>Historically, pytest in <code>pyproject.toml</code> used <code>[tool.pytest.ini_options]</code> — a compatibility shim mimicking INI syntax. Newer pytest supports <strong>native TOML</strong> under <code>[tool.pytest]</code> with proper types:</p>
+        <pre><code class="language-toml"># pyproject.toml — native TOML (pytest 9+)
+[tool.pytest]
+minversion = "9.0"
+testpaths = ["tests"]
+addopts = ["-ra", "-q", "--strict-markers"]
+python_files = ["test_*.py", "*_test.py"]
+markers = [
+    "slow: marks tests as slow",
+    "integration: integration tests",
+]
+
+[tool.pytest.logging]
+log_cli = true
+log_cli_level = "INFO"
+
+[tool.pytest.warnings]
+filterwarnings = ["error", "ignore::DeprecationWarning"]</code></pre>
+        <p>Benefits of native TOML:</p>
+        <ul>
+            <li>Proper arrays and booleans (no string quoting tricks)</li>
+            <li>Nested tables for related options</li>
+            <li>Cleaner diffs in PRs</li>
+        </ul>
+        <div class="note">📌 If you support pytest &lt; 9, stick with <code>[tool.pytest.ini_options]</code>. Native TOML is the future but requires a recent pytest.</div>
+
+        <!-- =================== 26 =================== -->
+        <h2 id="s26">26. Customizing fixtures with CLI args &amp; markers <span class="badge adv">advanced</span></h2>
+        <p>Real-world pattern: same test suite, different backends. Let users switch via CLI flag or marker.</p>
+
+        <h3>Fixture reacting to a CLI option</h3>
+        <pre><code class="language-python"># conftest.py
+import pytest
+
+def pytest_addoption(parser):
+    parser.addoption("--use-db", action="store_true", default=False,
+                     help="use the real database instead of the fake one")
+
+@pytest.fixture
+def db(request):
+    if request.config.getoption("--use-db"):
+        return RealDatabase()
+    return FakeDatabase()</code></pre>
+        <p>Run with real DB: <code>pytest --use-db</code>. Default: fake.</p>
+
+        <h3>Fixture reacting to a marker</h3>
+        <pre><code class="language-python">@pytest.fixture
+def api_client(request):
+    # marker-based fixture switching
+    if request.node.get_closest_marker("slow"):
+        return RealAPIClient(timeout=30)
+    return MockAPIClient()
+
+@pytest.mark.slow
+def test_full_network_roundtrip(api_client):
+    assert api_client.is_real</code></pre>
+
+        <h3>Fixture reacting to <code>request.param</code> with conditional setup</h3>
+        <pre><code class="language-python">@pytest.fixture(params=["sqlite", "postgres"])
+def backend(request):
+    if request.param == "sqlite":
+        db = connect_sqlite(":memory:")
+    else:
+        db = connect_postgres(os.environ["PG_URL"])
+    yield db
+    db.close()</code></pre>
+        <div class="tip">💡 This pattern lets you keep <strong>one</strong> test suite that runs against multiple environments without duplicating tests.</div>
+
+        <!-- =================== 27 =================== -->
+        <h2 id="s27">27. Flaky test mitigation <span class="badge new">new</span></h2>
+        <p>Flaky tests are the #1 cause of CI distrust. Here's how to hunt and tame them.</p>
+
+        <h3>Detect flakiness</h3>
+        <pre><code class="language-bash">pip install pytest-randomly pytest-rerunfailures</code></pre>
+        <ul>
+            <li><code>pytest-randomly</code> — shuffles test order every run. If tests fail intermittently, you have hidden state.</li>
+            <li><code>pytest --lf</code> — reruns only previously failed tests to confirm.</li>
+            <li><code>pytest -p no:cacheprovider --lf</code> — clean rerun.</li>
+        </ul>
+
+        <h3>Rerun flaky tests (temporary mitigation)</h3>
+        <pre><code class="language-bash">pip install pytest-rerunfailures
+pytest --reruns 3 --reruns-delay 1</code></pre>
+        <p>Or per-test:</p>
+        <pre><code class="language-python">@pytest.mark.flaky(reruns=3, reruns_delay=2)
+def test_unreliable_external_api():
+    assert call_flaky_endpoint() == "ok"</code></pre>
+        <div class="warning">⚠️ Reruns <strong>hide</strong> flakiness — always log and investigate. Prefer fixing the root cause (shared state, time, network, order-dependence).</div>
+
+        <h3>Common flakiness causes</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Symptom</th><th>Root cause</th><th>Fix</th></tr></thead>
+                <tbody>
+                    <tr><td>Passes alone, fails in suite</td><td>Test interdependence</td><td>Isolate state; use <code>pytest-randomly</code></td></tr>
+                    <tr><td>Random failures on time</td><td>Time-dependent code</td><td><code>freezegun</code> / <code>pytest-freezegun</code></td></tr>
+                    <tr><td>Fails under parallel run</td><td>Shared ports, files, DB</td><td>Unique temp dirs (<code>tmp_path</code>), random ports, per-worker DB</td></tr>
+                    <tr><td>Race conditions</td><td>Async timing</td><td>Use events, not <code>sleep</code>; use <code>pytest-timeout</code></td></tr>
+                    <tr><td>Network timeouts</td><td>External dependency</td><td>Mock or <code>--reruns</code> (last resort)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3><code>pytest-xdist</code> caveats</h3>
+        <ul>
+            <li>Tests run in <strong>separate processes</strong> — no shared in-memory state.</li>
+            <li>Session-scoped fixtures are per-worker, not global.</li>
+            <li>Ports, files, and databases must be unique per worker (<code>request.config.workerinput</code> exposes the worker id).</li>
+            <li>Output ordering is non-deterministic — use <code>-p no:randomly</code> together with <code>-n</code> carefully.</li>
+        </ul>
+        <pre><code class="language-python">@pytest.fixture(scope="session")
+def unique_db(request):
+    worker = getattr(request.config, "workerinput", {}).get("workerid", "master")
+    return f"test_db_{worker}"</code></pre>
+
+        <!-- =================== 28 =================== -->
+        <h2 id="s28">28. Running pytest programmatically <span class="badge adv">advanced</span></h2>
+        <p>You can invoke pytest from Python — great for custom runners, IDEs, notebooks, or dashboards.</p>
+        <pre><code class="language-python">import pytest
+
+# simplest: run pytest with args
+exit_code = pytest.main(["-v", "tests/", "--maxfail=3"])
+
+# use pytest.ExitCode constants instead of magic numbers
+if exit_code == pytest.ExitCode.OK:
+    print("All tests passed")
+elif exit_code == pytest.ExitCode.TESTS_FAILED:
+    print("Some tests failed")
+elif exit_code == pytest.ExitCode.NO_TESTS_COLLECTED:
+    print("No tests were found")</code></pre>
+        <p><code>pytest.ExitCode</code> values:</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+                <tbody>
+                    <tr><td><code>OK</code> (0)</td><td>All tests passed</td></tr>
+                    <tr><td><code>TESTS_FAILED</code> (1)</td><td>Some tests failed</td></tr>
+                    <tr><td><code>INTERRUPTED</code> (2)</td><td>User interrupted (Ctrl+C)</td></tr>
+                    <tr><td><code>INTERNAL_ERROR</code> (3)</td><td>Internal error</td></tr>
+                    <tr><td><code>USAGE_ERROR</code> (4)</td><td>CLI usage error</td></tr>
+                    <tr><td><code>NO_TESTS_COLLECTED</code> (5)</td><td>No tests found</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p>Advanced: build a test dashboard by iterating over collected items.</p>
+        <pre><code class="language-python">import pytest
+
+class Collector:
+    def __init__(self):
+        self.items = []
+    def pytest_collection_finish(self, session):
+        self.items = [item.nodeid for item in session.items]
+
+collector = Collector()
+pytest.main(["tests/", "--co", "-q"], plugins=[collector])
+print(f"Collected {len(collector.items)} tests")</code></pre>
+
+        <!-- =================== 29 =================== -->
+        <h2 id="s29">29. Test taxonomy: unit / integration / e2e / smoke</h2>
         <div class="table-wrap">
             <table>
                 <thead><tr><th>Type</th><th>Scope</th><th>Speed</th><th>Marker</th></tr></thead>
@@ -1067,8 +1328,25 @@ pytest -m "smoke"       # pre-commit / pre-push
 pytest -m "not e2e"     # CI fast lane
 pytest -m e2e           # nightly</code></pre>
 
-        <!-- ===================================================== -->
-        <h2 id="s25">25. Anti-patterns &amp; pitfalls</h2>
+        <h3>Test naming conventions</h3>
+        <ul>
+            <li>File: <code>test_&lt;module&gt;.py</code></li>
+            <li>Class: <code>Test&lt;Feature&gt;</code> (no <code>__init__</code>)</li>
+            <li>Function: <code>test_&lt;behavior&gt;_&lt;condition&gt;_&lt;expected&gt;</code></li>
+            <li>Prefer descriptive over clever: <code>test_login_with_wrong_password_returns_401</code></li>
+        </ul>
+
+        <h3>Arrange-Act-Assert</h3>
+        <pre><code class="language-python">def test_add_item_increases_cart_total():
+    # Arrange
+    cart = Cart()
+    # Act
+    cart.add(Item(price=10))
+    # Assert
+    assert cart.total == 10</code></pre>
+
+        <!-- =================== 30 =================== -->
+        <h2 id="s30">30. Anti-patterns &amp; pitfalls</h2>
 
         <h3>❌ Test interdependence</h3>
         <pre><code class="language-python"># BAD — test_b assumes test_a ran
@@ -1102,16 +1380,22 @@ def shared_list():
         <p>A 500ms DB connection recreated per test adds up fast. Use <code>scope="module"</code> or <code>"session"</code> if tests don't mutate shared state.</p>
 
         <h3>❌ Many unrelated asserts in one test</h3>
-        <p>The first failure hides the rest. Prefer one logical assertion per test, or use <code>parametrize</code>.</p>
+        <p>The first failure hides the rest. Prefer one logical assertion per test, or use <code>parametrize</code> / <code>subtests</code>.</p>
 
         <h3>❌ Relying on <code>print()</code></h3>
         <p>Use <code>capsys</code> / <code>caplog</code> so tests can assert on output.</p>
 
-        <h3>❌ Assuming assert order doesn't matter</h3>
-        <p>pytest's rewriting shows you values — but only for the first failed assert in a statement chain. Keep each statement focused.</p>
+        <h3>❌ Relying on test execution order</h3>
+        <p>Tests must be independent. Install <code>pytest-randomly</code> to catch order-dependence bugs early.</p>
 
-        <!-- ===================================================== -->
-        <h2 id="s26">26. Common errors → fixes <span class="badge new">new</span></h2>
+        <h3>❌ Hardcoded paths and ports</h3>
+        <p>Use <code>tmp_path</code> and ephemeral ports (<code>socket.bind(("", 0))</code>) to avoid clashes in parallel runs.</p>
+
+        <h3>❌ Testing private functions directly</h3>
+        <p>Prefer testing through the public API. If you must test privates, a leading underscore still means "implementation detail — free to change".</p>
+
+        <!-- =================== 31 =================== -->
+        <h2 id="s31">31. Common errors → fixes <span class="badge new">new</span></h2>
 
         <div class="err">
             <strong>ModuleNotFoundError: No module named 'myapp'</strong>
@@ -1166,8 +1450,23 @@ markers =
             <p>State leaks between tests. Run <code>pytest -p no:randomly --lf</code>, or install <code>pytest-randomly</code> to catch ordering issues. Look for module-level globals, shared fixtures with <code>scope="module"</code>, or mutated default arguments.</p>
         </div>
 
-        <!-- ===================================================== -->
-        <h2 id="s27">27. CI with GitHub Actions</h2>
+        <div class="err">
+            <strong>Fixture finalizer not called / teardown not running</strong>
+            <p>Check that the fixture uses <code>yield</code> (or <code>request.addfinalizer</code>) and that exceptions inside the test don't prevent teardown (pytest always runs finalizers). If setup fails before <code>yield</code>, teardown won't run — the setup itself is the test's failure.</p>
+        </div>
+
+        <div class="err">
+            <strong>WarningSummary: X warnings</strong>
+            <p>Configure filters in <code>pyproject.toml</code>:</p>
+            <pre><code class="language-toml">[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:my_legacy_module",
+]</code></pre>
+        </div>
+
+        <!-- =================== 32 =================== -->
+        <h2 id="s32">32. CI with GitHub Actions</h2>
         <pre><code class="language-yaml"># .github/workflows/test.yml
 name: Tests
 
@@ -1211,8 +1510,8 @@ jobs:
 [![codecov](https://codecov.io/gh/USER/REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/USER/REPO)</code></pre>
         <div class="tip">💡 Cache pip, cache <code>.pytest_cache</code>, and use <code>pytest-xdist -n auto</code> for large suites.</div>
 
-        <!-- ===================================================== -->
-        <h2 id="s28">28. Real-world example: a calculator library</h2>
+        <!-- =================== 33 =================== -->
+        <h2 id="s33">33. Real-world example: a calculator library</h2>
         <div class="file-tree">
             my_project/<br>
             ├── src/myapp/<br>
@@ -1286,6 +1585,471 @@ def test_cli_prints_result(capsys, calc):
 
         <!-- ===================================================== -->
         <hr>
+        <h2 id="interview">🎤 pytest Interview Questions <span class="badge iq">60+ Q&amp;A</span></h2>
+        <p>Sixty-plus interview questions covering pytest from junior to senior level. Click any question to reveal the answer.</p>
+
+        <div class="iq-legend">
+            <span class="level-easy"><strong>Easy</strong> — expected of any pytest user</span>
+            <span class="level-mid"><strong>Intermediate</strong> — mid-level engineer</span>
+            <span class="level-hard"><strong>Advanced</strong> — senior / test-infra roles</span>
+        </div>
+
+        <h3>Fundamentals</h3>
+
+        <details>
+            <summary><span class="qnum">1</span><span class="level-easy"></span> What is pytest and why use it over unittest?</summary>
+            <p>pytest is a Python testing framework. Advantages over <code>unittest</code>:</p>
+            <ul>
+                <li>Plain <code>assert</code> with rich rewriting instead of <code>self.assertEqual</code> methods</li>
+                <li>Fixtures instead of <code>setUp</code>/<code>tearDown</code> — more composable and granular</li>
+                <li>Parametrization built in</li>
+                <li>Massive plugin ecosystem</li>
+                <li>Auto-discovery — no boilerplate</li>
+                <li>Runs <code>unittest.TestCase</code> classes too, so migration is gradual</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary><span class="qnum">2</span><span class="level-easy"></span> How does pytest discover tests?</summary>
+            <p>By default:</p>
+            <ul>
+                <li>Files named <code>test_*.py</code> or <code>*_test.py</code></li>
+                <li>Classes prefixed <code>Test</code> (no <code>__init__</code>)</li>
+                <li>Functions prefixed <code>test_</code></li>
+                <li>Starts from the current directory or <code>testpaths</code> in config</li>
+            </ul>
+            <p>Configurable via <code>python_files</code>, <code>python_classes</code>, <code>python_functions</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">3</span><span class="level-easy"></span> What is assertion rewriting in pytest?</summary>
+            <p>Before running tests, pytest parses and rewrites the AST of test modules, replacing each <code>assert</code> with a call that captures intermediate values. This produces readable failures like <code>assert (1 + 2) == 4</code> and works even under <code>python -O</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">4</span><span class="level-easy"></span> What is the difference between <code>pytest.raises</code> and <code>try/except</code>?</summary>
+            <p><code>pytest.raises</code> fails the test if the exception is <em>not</em> raised, and can assert on the message via <code>match</code>. <code>try/except</code> silently passes if no exception occurs, which is usually a bug.</p>
+            <pre><code class="language-python">with pytest.raises(ValueError, match="bad"):
+    divide(1, 0)</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">5</span><span class="level-easy"></span> How do you run a single test?</summary>
+            <pre><code class="language-bash">pytest tests/test_calc.py::test_add
+pytest tests/test_calc.py::TestCalc::test_add
+pytest tests/test_calc.py::test_add[1-2]</code></pre>
+        </details>
+
+        <h3>Fixtures</h3>
+
+        <details>
+            <summary><span class="qnum">6</span><span class="level-easy"></span> What is a fixture in pytest?</summary>
+            <p>A fixture is a function decorated with <code>@pytest.fixture</code> that provides setup data or resources to tests. Tests request fixtures by name as arguments. Fixtures can return values or use <code>yield</code> for setup/teardown.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">7</span><span class="level-mid"></span> What are the fixture scopes and when do you use each?</summary>
+            <ul>
+                <li><code>function</code> (default) — fresh per test. Safe but slow if setup is heavy.</li>
+                <li><code>class</code> — once per test class.</li>
+                <li><code>module</code> — once per test file.</li>
+                <li><code>package</code> — once per package.</li>
+                <li><code>session</code> — once per test session. Use for expensive resources (DB engine, HTTP client) when tests don't mutate them.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary><span class="qnum">8</span><span class="level-mid"></span> How do fixtures interact with each other?</summary>
+            <p>Fixtures can request other fixtures by name as arguments. pytest resolves the dependency graph and caches results according to scope. This enables composition.</p>
+            <pre><code class="language-python">@pytest.fixture
+def db_conn(db_url):
+    return connect(db_url)</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">9</span><span class="level-mid"></span> What is the difference between <code>yield</code> and <code>request.addfinalizer</code> in fixtures?</summary>
+            <p>Both register teardown. <code>yield</code> is the modern, cleaner form for a single teardown. Use <code>request.addfinalizer</code> when you need to register multiple conditional cleanup callbacks.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">10</span><span class="level-mid"></span> How can a fixture know which test is using it?</summary>
+            <p>Request the built-in <code>request</code> fixture. Then access <code>request.node</code> (the test item), <code>request.function</code>, <code>request.cls</code>, <code>request.config</code>, or <code>request.node.get_closest_marker("...")</code> to branch behaviour by marker.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">11</span><span class="level-mid"></span> What is <code>autouse=True</code> and when should you use it?</summary>
+            <p>It makes a fixture apply to every test in scope without being explicitly requested. Use sparingly — for cross-cutting concerns like logging or environment setup. Overuse hides dependencies.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">12</span><span class="level-mid"></span> What is a fixture factory pattern?</summary>
+            <p>A fixture that returns a function so tests can create multiple objects with different args:</p>
+            <pre><code class="language-python">@pytest.fixture
+def make_user():
+    def _make(name, age):
+        return User(name, age)
+    return _make</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">13</span><span class="level-mid"></span> How do you make a fixture return different values for different tests?</summary>
+            <p>Use <code>@pytest.fixture(params=[...])</code> and read <code>request.param</code>. Each param value triggers a separate test run. Use <code>ids=</code> for readable names.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">14</span><span class="level-hard"></span> Explain <code>conftest.py</code> hierarchy and fixture override rules.</summary>
+            <p>Each directory can have a <code>conftest.py</code> loaded for that directory and its children. Fixtures defined in a <code>conftest.py</code> are visible to all tests below it. If a child <code>conftest.py</code> defines a fixture with the same name, it overrides the parent for tests in that subtree. Tests can also override per-module by defining a local fixture.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">15</span><span class="level-hard"></span> Why does a session-scoped fixture fail when it requests a function-scoped fixture?</summary>
+            <p>Because the wider scope would need to cache a value that changes per test. pytest raises <code>ScopeMismatch</code>. Fix: broaden the inner fixture's scope, or restructure so the function-scoped fixture requests the session-scoped one (never the reverse).</p>
+        </details>
+
+        <h3>Parametrization &amp; Marks</h3>
+
+        <details>
+            <summary><span class="qnum">16</span><span class="level-easy"></span> What does <code>@pytest.mark.parametrize</code> do?</summary>
+            <p>It runs the same test function with multiple sets of arguments, generating one test case per parameter set. Failures are reported individually.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">17</span><span class="level-mid"></span> How do you skip or xfail a test?</summary>
+            <p>Skip: <code>@pytest.mark.skip</code> or <code>@pytest.mark.skipif(cond, reason=...)</code>. Expected failure: <code>@pytest.mark.xfail</code>. Runtime: <code>pytest.skip()</code>, <code>pytest.xfail()</code>, <code>pytest.fail()</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">18</span><span class="level-mid"></span> What is the difference between <code>skip</code>, <code>xfail</code>, and <code>fail</code>?</summary>
+            <ul>
+                <li><strong>skip</strong> — not run, not a failure.</li>
+                <li><strong>xfail</strong> — run; if it fails, that's expected (marked <code>xfail</code>); if it passes, marked <code>xpass</code>. <code>xfail_strict = true</code> makes xpass an error.</li>
+                <li><strong>fail</strong> — force a failure with a message.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary><span class="qnum">19</span><span class="level-mid"></span> How do you run only tests with a specific marker?</summary>
+            <pre><code class="language-bash">pytest -m slow
+pytest -m "integration and not slow"</code></pre>
+            <p>Register markers in <code>pytest.ini</code> to avoid warnings:</p>
+            <pre><code class="language-ini">[pytest]
+markers =
+    slow: marks tests as slow</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">20</span><span class="level-mid"></span> Can you stack multiple <code>parametrize</code> decorators?</summary>
+            <p>Yes — the result is the Cartesian product of all parameter sets. Order matters for readability of node IDs.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">21</span><span class="level-hard"></span> How do you use <code>pytest.param</code> to attach marks to a specific parametrize case?</summary>
+            <pre><code class="language-python">@pytest.mark.parametrize("x, y", [
+    pytest.param(1, 1, id="one-one"),
+    pytest.param(2, 2, marks=pytest.mark.skip(reason="todo")),
+])
+def test_pair(x, y):
+    assert x == y</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">22</span><span class="level-hard"></span> What is <code>indirect=True</code> in parametrize?</summary>
+            <p>It sends the parametrized values through a fixture instead of the test directly. Useful when the fixture must transform the parameter (e.g., construct an object).</p>
+            <pre><code class="language-python">@pytest.mark.parametrize("user", [1, 2], indirect=True)
+def test_user(user):
+    assert user.id in (1, 2)</code></pre>
+        </details>
+
+        <h3>Built-in fixtures</h3>
+
+        <details>
+            <summary><span class="qnum">23</span><span class="level-easy"></span> What are <code>tmp_path</code> and <code>tmp_path_factory</code>?</summary>
+            <p><code>tmp_path</code> is a function-scoped fixture returning a unique <code>pathlib.Path</code> per test, cleaned up automatically. <code>tmp_path_factory</code> produces temp directories at session or module scope.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">24</span><span class="level-mid"></span> How do you capture stdout in a test?</summary>
+            <p>Request the <code>capsys</code> fixture (or <code>capfd</code> for FD-level output) and call <code>capsys.readouterr()</code> to get a namedtuple with <code>.out</code> and <code>.err</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">25</span><span class="level-mid"></span> How do you capture logs in a test?</summary>
+            <p>Use the <code>caplog</code> fixture:</p>
+            <pre><code class="language-python">def test_log(caplog):
+    with caplog.at_level(logging.WARNING):
+        logger.warning("boom")
+    assert "boom" in caplog.text</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">26</span><span class="level-mid"></span> How do you temporarily change an environment variable?</summary>
+            <p>Use <code>monkeypatch.setenv("KEY", "value")</code>. It's restored automatically after the test.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">27</span><span class="level-mid"></span> How do you capture warnings?</summary>
+            <p>Use <code>pytest.warns(Category, match="...")</code> as a context manager, or <code>pytest.deprecated_call()</code> for deprecation warnings. To ensure <em>no</em> warning is raised, use <code>warnings.catch_warnings()</code> + <code>simplefilter("error")</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">28</span><span class="level-mid"></span> What does <code>pytest.approx</code> do?</summary>
+            <p>Compares floating-point numbers (and sequences/dicts) with tolerance, avoiding false negatives from binary floating-point.</p>
+            <pre><code class="language-python">assert 0.1 + 0.2 == pytest.approx(0.3)</code></pre>
+        </details>
+
+        <h3>Mocking &amp; monkeypatch</h3>
+
+        <details>
+            <summary><span class="qnum">29</span><span class="level-mid"></span> Difference between <code>monkeypatch</code> and <code>unittest.mock</code>?</summary>
+            <p><code>monkeypatch</code> temporarily modifies environment, attributes, dicts, <code>sys.path</code>, and CWD — ideal for simple, reversible substitutions. <code>unittest.mock</code> (or <code>pytest-mock</code>) provides call tracking, return-value configuration, side effects, and assertion helpers. Use monkeypatch for env/attributes, mock for behavioural stubs.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">30</span><span class="level-mid"></span> How do you mock a function imported in another module?</summary>
+            <p>Patch where it's <em>used</em>, not where it's defined:</p>
+            <pre><code class="language-python"># mymod.py has: from requests import get
+# patch mymod.get, not requests.get
+monkeypatch.setattr("mymod.get", fake_get)</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">31</span><span class="level-hard"></span> What is <code>mocker</code> and how does <code>pytest-mock</code> help?</summary>
+            <p><code>pytest-mock</code> exposes a <code>mocker</code> fixture wrapping <code>unittest.mock</code>. It automatically undoes all patches at test end (no context manager needed) and gives you <code>mocker.patch</code>, <code>mocker.spy</code>, <code>mocker.stub</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">32</span><span class="level-hard"></span> How would you test code that calls <code>datetime.now()</code>?</summary>
+            <p>Freeze time. Either use <code>freezegun</code> / <code>pytest-freezegun</code>:</p>
+            <pre><code class="language-python">@pytest.mark.freeze_time("2020-01-01")
+def test_new_year():
+    assert datetime.now().year == 2020</code></pre>
+            <p>Or inject a clock abstraction so the test passes a fake clock. Injection is preferable for long-lived code.</p>
+        </details>
+
+        <h3>Advanced pytest</h3>
+
+        <details>
+            <summary><span class="qnum">33</span><span class="level-hard"></span> What is <code>pytest_generate_tests</code> and when do you need it?</summary>
+            <p>A hook for <em>dynamic</em> parametrization — parameters defined at collection time from a data source (CSV, DB, environment). Use it when the values aren't known when the file is written.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">34</span><span class="level-hard"></span> How do you write a custom pytest plugin?</summary>
+            <p>Create a module with hook functions (e.g. <code>pytest_configure</code>) and register it via entry point:</p>
+            <pre><code class="language-toml">[project.entry-points.pytest11]
+myplugin = "myplugin"</code></pre>
+            <p>After <code>pip install -e .</code>, pytest loads it automatically. Verify with <code>pytest --trace-config</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">35</span><span class="level-hard"></span> What is <code>pytest_addoption</code> and how do you use it?</summary>
+            <p>Hook that registers custom CLI flags:</p>
+            <pre><code class="language-python">def pytest_addoption(parser):
+    parser.addoption("--env", default="dev")</code></pre>
+            <p>Read via <code>request.config.getoption("--env")</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">36</span><span class="level-hard"></span> What is <code>pytest_collection_modifyitems</code>?</summary>
+            <p>A hook that lets you reorder, filter, or add markers to collected test items. Common use: auto-mark slow tests based on path, or reorder so unit tests run first.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">37</span><span class="level-hard"></span> What is <code>pytest_assertrepr_compare</code>?</summary>
+            <p>A hook that lets you customize the failure message when two objects compare unequal. Useful for domain-specific types where the default diff isn't helpful.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">38</span><span class="level-mid"></span> What are sub-tests, and when do you use them instead of <code>parametrize</code>?</summary>
+            <p>Sub-tests (<code>with subtests.test(...)</code>) let one test contain multiple independently-reported assertions. Use them when parameters aren't known at collection time (e.g., iterating over files in a directory) and you want to see all failures, not just the first. Use <code>parametrize</code> when values are known statically.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">39</span><span class="level-hard"></span> What is <code>pytest.ExitCode</code> and how do you use it?</summary>
+            <p>Enum of pytest exit codes returned by <code>pytest.main()</code>. Use it in scripts instead of magic numbers:</p>
+            <pre><code class="language-python">if pytest.main(["tests/"]) == pytest.ExitCode.OK:
+    ...</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">40</span><span class="level-hard"></span> How do you run pytest programmatically?</summary>
+            <pre><code class="language-python">import pytest
+exit_code = pytest.main(["-v", "tests/", "--maxfail=1"])</code></pre>
+            <p>Useful for custom runners, IDEs, notebooks, dashboards.</p>
+        </details>
+
+        <h3>Debugging &amp; Running</h3>
+
+        <details>
+            <summary><span class="qnum">41</span><span class="level-easy"></span> How do you drop into a debugger on failure?</summary>
+            <pre><code class="language-bash">pytest --pdb</code></pre>
+            <p>Or use <code>pytest.set_trace()</code> at a point, run with <code>-s</code> so output isn't captured.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">42</span><span class="level-mid"></span> What does <code>pytest --lf</code> do?</summary>
+            <p>Runs only the tests that failed last time (based on <code>.pytest_cache</code>). Great for iterating quickly on a broken test. <code>--ff</code> runs failures first, then the rest.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">43</span><span class="level-mid"></span> How do you find the slowest tests?</summary>
+            <pre><code class="language-bash">pytest --durations=10</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">44</span><span class="level-mid"></span> How do you see fixture setup order?</summary>
+            <pre><code class="language-bash">pytest --setup-show</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">45</span><span class="level-mid"></span> What does <code>pytest --co</code> do?</summary>
+            <p>Collect-only. Lists which tests would run without executing them. Useful for debugging discovery problems.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">46</span><span class="level-mid"></span> How do you list all fixtures and markers registered?</summary>
+            <pre><code class="language-bash">pytest --fixtures
+pytest --markers</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">47</span><span class="level-hard"></span> What is <code>pytest --trace-config</code> for?</summary>
+            <p>Shows which plugins are loaded and their entry points. Invaluable when a plugin misbehaves or when you're not sure if your custom plugin registered.</p>
+        </details>
+
+        <h3>Configuration &amp; structure</h3>
+
+        <details>
+            <summary><span class="qnum">48</span><span class="level-mid"></span> Where can pytest configuration live?</summary>
+            <p>In priority order: <code>pytest.ini</code>, <code>pyproject.toml</code> (<code>[tool.pytest.ini_options]</code> or <code>[tool.pytest]</code>), <code>tox.ini</code>, <code>setup.cfg</code>. Only one is used per invocation.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">49</span><span class="level-mid"></span> What is <code>PYTEST_ADDOPTS</code>?</summary>
+            <p>An environment variable whose contents are appended to pytest's CLI arguments. Great for local defaults or CI overrides without touching config files.</p>
+            <pre><code class="language-bash">PYTEST_ADDOPTS="-vv --pdb" pytest</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">50</span><span class="level-hard"></span> Explain pytest import modes.</summary>
+            <ul>
+                <li><strong>prepend</strong> (default): test's directory prepended to <code>sys.path</code>. Simple; can shadow same-named modules.</li>
+                <li><strong>append</strong>: appended to <code>sys.path</code>. Rarely needed.</li>
+                <li><strong>importlib</strong>: import by file path without touching <code>sys.path</code>. Requires <code>__init__.py</code> in test dirs to avoid name clashes.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary><span class="qnum">51</span><span class="level-hard"></span> When do you need <code>__init__.py</code> in your tests folder?</summary>
+            <ul>
+                <li>Same test module name in two folders: yes, or use <code>--import-mode=importlib</code>.</li>
+                <li>Shipping tests as a package: yes.</li>
+                <li>Traditional project with tests importing an installed package: no.</li>
+            </ul>
+        </details>
+
+        <h3>Plugins &amp; quality</h3>
+
+        <details>
+            <summary><span class="qnum">52</span><span class="level-mid"></span> Name three pytest plugins you use and why.</summary>
+            <p>Examples: <code>pytest-cov</code> (coverage), <code>pytest-xdist</code> (parallelism), <code>pytest-mock</code> (cleaner mocks), <code>pytest-randomly</code> (order independence), <code>pytest-timeout</code> (hang protection), <code>pytest-asyncio</code> (async tests).</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">53</span><span class="level-mid"></span> How do you measure test coverage?</summary>
+            <pre><code class="language-bash">pip install pytest-cov
+pytest --cov=myapp --cov-report=term-missing --cov-report=html</code></pre>
+            <p>In CI: <code>--cov-report=xml</code> + upload to Codecov/Coveralls.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">54</span><span class="level-mid"></span> What does <code>pytest-randomly</code> do and why use it?</summary>
+            <p>Shuffles test order (and resets random seeds) each run. Exposes hidden test interdependence and order-dependent bugs before they hit CI.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">55</span><span class="level-hard"></span> How do you parallelize tests and what are the caveats?</summary>
+            <p><code>pytest-xdist</code> with <code>pytest -n auto</code>. Caveats: tests run in separate processes, so no shared in-memory state; session fixtures are per-worker; ports/files/DBs must be unique per worker (use <code>workerinput["workerid"]</code>). Output order is non-deterministic.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">56</span><span class="level-hard"></span> How do you mitigate flaky tests?</summary>
+            <ul>
+                <li>Detect with <code>pytest-randomly</code>.</li>
+                <li>Fix root causes (state, time, order, concurrency).</li>
+                <li>Use <code>pytest-timeout</code> to fail fast on hangs.</li>
+                <li>As a last resort: <code>pytest-rerunfailures</code> with <code>@pytest.mark.flaky</code> — but log and fix.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary><span class="qnum">57</span><span class="level-mid"></span> What is property-based testing and how does Hypothesis fit in?</summary>
+            <p>Instead of specific inputs, you assert invariants ("for all x: add(x, 0) == x"). Hypothesis generates hundreds of inputs, then shrinks failures to the smallest reproducer. Integrates seamlessly with pytest via <code>@given</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">58</span><span class="level-mid"></span> What is the difference between a mock and a fake?</summary>
+            <p>A <strong>mock</strong> records calls and returns programmed values. A <strong>fake</strong> is a lightweight working implementation (in-memory DB, fake HTTP server). Fakes test more real behaviour; mocks are cheaper but more brittle.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">59</span><span class="level-hard"></span> How would you test a Django or FastAPI app with pytest?</summary>
+            <p>Django: <code>pytest-django</code> with <code>@pytest.mark.django_db</code>. FastAPI: <code>fastapi.testclient.TestClient</code> plus <code>httpx.AsyncClient</code> for async, using fixtures to build the app. Both use <code>conftest.py</code> for shared fixtures.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">60</span><span class="level-hard"></span> How do you test async code?</summary>
+            <p>Install <code>pytest-asyncio</code>, mark tests with <code>@pytest.mark.asyncio</code> (or set <code>asyncio_mode = "auto"</code>). Async fixtures are supported. Alternative: <code>anyio</code>'s pytest plugin for asyncio + trio.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">61</span><span class="level-mid"></span> How do you test CLI tools?</summary>
+            <p>Use <code>subprocess.run</code> with <code>capsys</code> isn't enough (it captures Python-level output only). Better: test the <code>main()</code> function directly by passing <code>argv</code>, capture stdout with <code>capsys</code>. Or use <code>typer.testing.CliRunner</code> / <code>click.testing.CliRunner</code>.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">62</span><span class="level-hard"></span> What is <code>pytest.raises</code> with <code>ExceptionGroup</code> (Python 3.11+)?</summary>
+            <pre><code class="language-python">with pytest.raises(ExceptionGroup) as exc:
+    raise ExceptionGroup("many", [ValueError("a"), TypeError("b")])
+assert len(exc.value.exceptions) == 2</code></pre>
+        </details>
+
+        <details>
+            <summary><span class="qnum">63</span><span class="level-hard"></span> How do you add a custom marker and prevent typos?</summary>
+            <p>Register it in config and enable strict markers:</p>
+            <pre><code class="language-ini">[pytest]
+markers =
+    smoke: quick smoke tests
+addopts = --strict-markers</code></pre>
+            <p>Unknown markers then raise errors instead of warnings.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">64</span><span class="level-hard"></span> What's the difference between <code>pytest.ini</code> and native <code>[tool.pytest]</code> in pyproject.toml?</summary>
+            <p><code>[tool.pytest.ini_options]</code> is INI compatibility mode (strings, quoted lists). Native <code>[tool.pytest]</code> (pytest 9+) uses proper TOML types (booleans, arrays, nested tables). Stick with <code>ini_options</code> for compatibility; adopt native TOML when you're on pytest 9+ and no longer need older versions.</p>
+        </details>
+
+        <details>
+            <summary><span class="qnum">65</span><span class="level-mid"></span> What's a good folder layout for tests in a real project?</summary>
+            <div class="file-tree">
+                src/myapp/<br>
+                ├── __init__.py<br>
+                └── calculator.py<br>
+                tests/<br>
+                ├── conftest.py<br>
+                ├── test_calculator.py<br>
+                ├── unit/<br>
+                │   └── test_math.py<br>
+                └── integration/<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;└── test_api.py
+            </div>
+            <p><code>src/</code> layout prevents import shadowing, forces installation (via <code>pip install -e .</code>), and makes tests reflect the installed package.</p>
+        </details>
+
+        <div class="note">📌 <strong>Pro tip for interviews:</strong> when asked about a concept, give a one-line definition, then a concrete example. Interviewers remember examples.</div>
+
+        <!-- ===================================================== -->
+        <hr>
         <h2 id="cheatsheet">Quick reference cheatsheet</h2>
 
         <h3>Commands</h3>
@@ -1312,6 +2076,7 @@ def test_cli_prints_result(capsys, calc):
                     <tr><td><code>pytest --cov=pkg</code></td><td>Coverage (pytest-cov)</td></tr>
                     <tr><td><code>pytest -n auto</code></td><td>Parallel (pytest-xdist)</td></tr>
                     <tr><td><code>pytest --doctest-modules</code></td><td>Run doctests</td></tr>
+                    <tr><td><code>pytest --reruns 3</code></td><td>Rerun flaky (pytest-rerunfailures)</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1332,6 +2097,8 @@ def test_cli_prints_result(capsys, calc):
                     <tr><td><code>@pytest.mark.parametrize</code></td><td>Parametrize test</td></tr>
                     <tr><td><code>indirect=True</code></td><td>Send params through a fixture</td></tr>
                     <tr><td><code>pytest.param(..., marks=...)</code></td><td>Per-case marks</td></tr>
+                    <tr><td><code>@pytest.mark.usefixtures("f")</code></td><td>Apply fixture without arg</td></tr>
+                    <tr><td><code>subtests</code> (8.4+)</td><td>Multiple failures per test</td></tr>
                     <tr><td><code>pytest.approx</code></td><td>Float tolerance</td></tr>
                     <tr><td><code>pytest.raises</code></td><td>Expect exception</td></tr>
                     <tr><td><code>pytest.warns</code></td><td>Expect warning</td></tr>
@@ -1341,6 +2108,8 @@ def test_cli_prints_result(capsys, calc):
                     <tr><td><code>caplog</code></td><td>Capture logging</td></tr>
                     <tr><td><code>monkeypatch</code></td><td>Env, attrs, syspath, chdir</td></tr>
                     <tr><td><code>doctest_namespace</code></td><td>Inject into doctest</td></tr>
+                    <tr><td><code>pytest.main()</code></td><td>Programmatic run</td></tr>
+                    <tr><td><code>pytest.ExitCode</code></td><td>Exit code enum</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1357,12 +2126,28 @@ def test_cli_prints_result(capsys, calc):
                     <tr><td><code>@pytest.mark.asyncio</code></td><td>Async test</td></tr>
                     <tr><td><code>@pytest.mark.parametrize</code></td><td>Parametrize</td></tr>
                     <tr><td><code>@pytest.mark.usefixtures("f")</code></td><td>Apply fixture without arg</td></tr>
+                    <tr><td><code>@pytest.mark.flaky(reruns=N)</code></td><td>Rerun on failure (plugin)</td></tr>
+                    <tr><td><code>@pytest.mark.dependency(depends=[...])</code></td><td>Test dependency (plugin)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Config quick reference</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>File / key</th><th>Purpose</th></tr></thead>
+                <tbody>
+                    <tr><td><code>pytest.ini</code></td><td>Classic INI config</td></tr>
+                    <tr><td><code>[tool.pytest.ini_options]</code></td><td>INI compat mode in pyproject.toml</td></tr>
+                    <tr><td><code>[tool.pytest]</code></td><td>Native TOML (pytest 9+)</td></tr>
+                    <tr><td><code>PYTEST_ADDOPTS</code></td><td>Env var, extra CLI args</td></tr>
+                    <tr><td><code>conftest.py</code></td><td>Per-directory fixtures &amp; hooks</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="footer">
-            <p><strong>Complete pytest tutorial</strong> · beginner → advanced · 28 sections · every example runnable</p>
+            <p><strong>Complete pytest tutorial + interview prep</strong> · beginner → advanced · 33 sections · 60+ interview questions · every example runnable</p>
             <p style="margin-top: 0.5rem; font-size: 0.85rem;">Fork, host on GitHub Pages, help others learn pytest.</p>
         </div>
     </main>
@@ -1381,7 +2166,6 @@ def test_cli_prints_result(capsys, calc):
         localStorage.setItem('theme', next);
     }
 
-    // Load saved theme
     (function() {
         const saved = localStorage.getItem('theme');
         if (saved === 'dark') {
