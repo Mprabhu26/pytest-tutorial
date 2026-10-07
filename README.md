@@ -30,7 +30,7 @@ Every example is runnable. Every concept is explained. Nothing is hand-waved.
 
 ## 🗂️ Repo structure
 
-pytest-tutorial/
+pytest-tutorial/</br>
 ├── index.html ← the entire tutorial (single file)
 ├── README.md ← this file
 └── LICENSE ← MIT (optional but recommended)
