@@ -31,9 +31,9 @@ Every example is runnable. Every concept is explained. Nothing is hand-waved.
 ## 🗂️ Repo structure
 
 pytest-tutorial/</br>
-├── index.html ← the entire tutorial (single file)
-├── README.md ← this file
-└── LICENSE ← MIT (optional but recommended)
+├── index.html ← the entire tutorial (single file)</br>
+├── README.md ← this file</br>
+└── LICENSE ← MIT (optional but recommended)</br>
 
 ## 🚀 Deploy your own
 
